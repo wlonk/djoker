@@ -43,8 +43,7 @@
         });
 
         socket.on('draw', function(message) {
-            console.log('received:');
-            console.dir(message);
+            $('#events').append("<li>" + message + "</li>");
         });
 
         $(document).ready(function() {
@@ -69,7 +68,8 @@
                 <button class="btn draw-button" data-action="hand">Hand draw</button>
                 <button class="btn draw-button" data-action="open">Open draw</button>
             </div>
-
+            <ul id="events">
+            </ul>
         </div>
 
     </body>
