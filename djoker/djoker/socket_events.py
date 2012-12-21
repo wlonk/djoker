@@ -18,6 +18,7 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
     def on_join(self, room):
         self.room = room
         self.join(room)
+        print ">>>> ACK", room
         return True
 
     def on_nickname(self, nickname):

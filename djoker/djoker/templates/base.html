@@ -42,17 +42,10 @@
             console.log('error: ' + e);
         });
 
-        socket.on('draw', function(message) {
-            $('#events').append("<li>" + message + "</li>");
-        });
-
-        $(document).ready(function() {
-            $('.draw-button').click(function(evt) {
-                var action = $(evt.target).data('action');
-                socket.emit('draw', {action: action});
-            });
-        });
+        //$(document).ready(function() {});
         </script>
+        {% block js %}
+        {% endblock %}
 
     </head>
     <body>
@@ -62,14 +55,9 @@
 
         <!-- Add your site or application content here -->
         <div id="content">
+            {% block content %}
             <h1>Djoker</h1>
-            <div class="btn-group">
-                <button class="btn draw-button" data-action="blind">Blind draw</button>
-                <button class="btn draw-button" data-action="hand">Hand draw</button>
-                <button class="btn draw-button" data-action="open">Open draw</button>
-            </div>
-            <ul id="events">
-            </ul>
+            {% endblock %}
         </div>
 
     </body>

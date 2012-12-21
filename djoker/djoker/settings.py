@@ -117,6 +117,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     #'realtime',
     'djoker',
+    'cards',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block js %}
+<script>
+$(document).ready(function() {
+    socket.emit('join', '{{ table.uuid }}');
+    socket.on('draw', function(message) {
+        $('#events').append("<li>" + message + "</li>");
+    });
+    $('.draw-button').click(function(evt) {
+        var action = $(evt.target).data('action');
+        socket.emit('draw', {action: action});
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<h1>At {{ table.uuid }}</h1>
+<div class="btn-group">
+    <button class="btn draw-button" data-action="blind">Blind draw</button>
+    <button class="btn draw-button" data-action="hand">Hand draw</button>
+    <button class="btn draw-button" data-action="open">Open draw</button>
+</div>
+<ul id="events">
+</ul>
+{% endblock %}
