@@ -78,7 +78,10 @@ $(document).ready(function() {
     UserCollection = Backbone.Collection.extend({
         model: User
     });
-    user_collection = new UserCollection([current_user]);
+    other_users = JSON.parse('{{ users|safe }}').map(function(x) {
+        return new User(x);
+    });
+    user_collection = new UserCollection(other_users);
 
 
     UpdatingUserView = Backbone.View.extend({
@@ -118,7 +121,6 @@ $(document).ready(function() {
     });
 
     userHandsView.render();
-
 
     //------
 
