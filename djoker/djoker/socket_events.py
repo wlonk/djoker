@@ -15,37 +15,25 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
     def log(self, message):
         self.logger.info("[{0}] {1}".format(self.socket.sessid, message))
 
+    def emit_to_all_in_room(self, room, event, *args):
+        """This is sent to all in the room (in this particular Namespace)"""
+        pkt = dict(type="event",
+                   name=event,
+                   args=args,
+                   endpoint=self.ns_name)
+        room_name = self._get_room_name(room)
+        for sessid, socket in self.socket.server.sockets.iteritems():
+            if 'rooms' not in socket.session:
+                continue
+            if room_name in socket.session['rooms']:
+                socket.send_packet(pkt)
+
     def on_join(self, room):
         self.room = room
         self.join(room)
-        print ">>>> ACK", room
-        return True
-
-    def on_nickname(self, nickname):
-        self.log('Nickname: {0}'.format(nickname))
-        self.nicknames.append(nickname)
-        self.socket.session['nickname'] = nickname
-        self.broadcast_event('announcement', '%s has connected' % nickname)
-        self.broadcast_event('nicknames', self.nicknames)
-        return True, nickname
-
-    def recv_disconnect(self):
-        # Remove nickname from the list.
-        self.log('Disconnected')
-        nickname = self.socket.session['nickname']
-        self.nicknames.remove(nickname)
-        self.broadcast_event('announcement', '%s has disconnected' % nickname)
-        self.broadcast_event('nicknames', self.nicknames)
-        self.disconnect(silent=True)
-        return True
-
-    def on_user_message(self, msg):
-        self.log('User message: {0}'.format(msg))
-        self.emit_to_room(self.room, 'msg_to_room',
-            self.socket.session['nickname'], msg)
         return True
 
     def on_draw(self, msg):
-        self.log('Draw: {0}'.format(msg))
-        self.broadcast_event('draw', 'Draw!')
+        room = msg['room']
+        self.emit_to_all_in_room(room, 'draw', 'Draw! {0}'.format(msg['action']))
         return True
