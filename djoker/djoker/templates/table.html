@@ -3,25 +3,168 @@
 {% block js %}
 <script>
 $(document).ready(function() {
+    // From http://liquidmedia.org/blog/2011/02/backbone-js-part-3/
+    var UpdatingCollectionView = Backbone.View.extend({
+        initialize : function(options) {
+            _(this).bindAll('add', 'remove');
+            if (!options.childViewConstructor) {
+                throw "no child view constructor provided";
+            }
+            if (!options.childViewTagName) {
+                throw "no child view tag name provided";
+            }
+            this._childViewConstructor = options.childViewConstructor;
+            this._childViewTagName = options.childViewTagName;
+            this._childViews = [];
+            this.collection.each(this.add);
+            this.collection.bind('add', this.add);
+            this.collection.bind('remove', this.remove);
+        },
+        add : function(model) {
+            var childView = new this._childViewConstructor({
+                tagName : this._childViewTagName,
+                model : model
+            });
+            this._childViews.push(childView);
+            if (this._rendered) {
+                $(this.el).append(childView.render().el);
+            }
+        },
+        remove : function(model) {
+            var viewToRemove = _(this._childViews).select(function(cv) {
+                return cv.model === model;
+            })[0];
+            this._childViews = _(this._childViews).without(viewToRemove);
+            if (this._rendered) {
+                $(viewToRemove.el).remove();
+            }
+        },
+        render : function() {
+            var that = this;
+            this._rendered = true;
+            $(this.el).empty();
+            _(this._childViews).each(function(childView) {
+                $(that.el).append(childView.render().el);
+            });
+            return this;
+        }
+    });
+
+    // Models
+    // -- User
+    User = Backbone.Model.extend({
+        clipped_uuid: function() {
+            var uuid = this.get('uuid');
+            return uuid.split('-')[0];
+        },
+        display_name: function() {
+            if (this.get('nickname')) {
+                return this.get('nickname') + ' (' + this.clipped_uuid() + ')';
+            } else {
+                return this.clipped_uuid();
+            }
+        }
+    });
+    current_user = new User({
+        uuid: $.cookie('uuid')
+    });
+    // @todo and we need all the other users at load time.
+    UserCollection = Backbone.Collection.extend({
+        model: User
+    });
+    user_collection = new UserCollection([current_user]);
+
+
+    UpdatingUserView = Backbone.View.extend({
+        model: User,
+        initialize: function(options) {
+            this.render = _.bind(this.render, this);
+            this.model.bind('change', this.render);
+        },
+        render: function() {
+            var template = _.template($("#user_template").html(), {user: this.model});
+            this.$el.html(template);
+            return this;
+        }
+    });
+
+
+    var UserHandsView = Backbone.View.extend({
+        initialize : function() {
+            this._userHandsCollectionView = new UpdatingCollectionView({
+                collection: user_collection,
+                childViewConstructor: UpdatingUserView,
+                childViewTagName: 'li'
+            });
+        },
+        render : function() {
+            $(this.el).empty();
+            var template = _.template($('#user_collection_template').html(), {});
+            this.$el.html(template);
+            this._userHandsCollectionView.el = this.$('#users');
+            this._userHandsCollectionView.render();
+        }
+    });
+
+    userHandsView = new UserHandsView({
+        model: User,
+        el: $('#user_list')
+    });
+
+    userHandsView.render();
+
+
+    //------
+
+    $('#nickname').change(function(evt) {
+        current_user.set({
+            nickname: $('#nickname').val()
+        });
+    });
+
     socket.emit('join', '{{ table.uuid }}');
     socket.on('draw', function(message) {
-        $('#events').append("<li>" + message + "</li>");
+        // Get the user
+        // Find or create in the collection
+        // Set all attributes appropriately
     });
+
     $('.draw-button').click(function(evt) {
         var action = $(evt.target).data('action');
-        socket.emit('draw', {action: action});
+        socket.emit('draw', {
+            action: action,
+            room: '{{ table.uuid }}'
+        });
     });
 });
+</script>
+<script type="text/template" id="user_collection_template">
+    <ul id="users">
+    </ul>
+</script>
+
+<script type="text/template" id="user_template">
+    <h2><%= user.display_name() %></h2>
+    <dl>
+        <dt>Blind</dt>
+        <dd><%= user.get('blind') %></dd>
+        <dt>Hand</dt>
+        <dd><%= user.get('hand') %></dd>
+        <dt>Open</dt>
+        <dd><%= user.get('open') %></dd>
+    </dl>
 </script>
 {% endblock %}
 
 {% block content %}
 <h1>At {{ table.uuid }}</h1>
+<div id="identity">
+    Nickname: <input id="nickname" type="text" />
+</div>
 <div class="btn-group">
     <button class="btn draw-button" data-action="blind">Blind draw</button>
     <button class="btn draw-button" data-action="hand">Hand draw</button>
     <button class="btn draw-button" data-action="open">Open draw</button>
 </div>
-<ul id="events">
-</ul>
+<div id="user_list"></div>
 {% endblock %}
