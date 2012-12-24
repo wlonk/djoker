@@ -53,6 +53,12 @@ $(document).ready(function() {
     // Models
     // -- User
     User = Backbone.Model.extend({
+        defaults: {
+            nickname: '',
+            blind: 0,
+            hand: 0,
+            open: 0
+        },
         clipped_uuid: function() {
             var uuid = this.get('uuid');
             return uuid.split('-')[0];
@@ -66,10 +72,7 @@ $(document).ready(function() {
         }
     });
     current_user = new User({
-        uuid: $.cookie('uuid'),
-        blind: 0,
-        hand: 0,
-        open: 0
+        uuid: $.cookie('uuid')
     });
     // @todo and we need all the other users at load time.
     UserCollection = Backbone.Collection.extend({
@@ -184,6 +187,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
 <script type="text/template" id="user_collection_template">
     <ul id="users">
     </ul>
@@ -212,5 +216,6 @@ $(document).ready(function() {
     <button class="btn draw-button" data-action="hand">Hand draw</button>
     <button class="btn draw-button" data-action="open">Open draw</button>
 </div>
-<div id="user_list"></div>
+<div id="user_list">
+</div>
 {% endblock %}
