@@ -3,7 +3,9 @@ from cards.models import Table
 
 
 def root(request):
-    return render_to_response('base.html')
+    return render_to_response('base.html', {
+        'tables': Table.objects.all()
+    })
 
 
 def table(request, uuid):

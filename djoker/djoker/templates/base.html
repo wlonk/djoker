@@ -60,6 +60,11 @@
         <div id="content">
             {% block content %}
             <h1>Djoker</h1>
+            <ul>
+            {% for table in tables %}
+                <li><a href="{{ table.uuid }}">{{ table.uuid }}</a></li>
+            {% endfor %}
+            </ul>
             {% endblock %}
         </div>
 

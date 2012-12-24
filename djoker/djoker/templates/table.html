@@ -119,12 +119,6 @@ $(document).ready(function() {
 
     //------
 
-    $('#nickname').change(function(evt) {
-        current_user.set({
-            nickname: $('#nickname').val()
-        });
-    });
-
     socket.emit('join', '{{ table.uuid }}');
     socket.on('draw', function(message) {
         // Get the user
@@ -149,6 +143,32 @@ $(document).ready(function() {
         var action = message['action'];
         var val = user.get(action);
         user.set(action, val + 1);
+    });
+    socket.on('nickname', function(message) {
+        var user = user_collection.where({
+            uuid: message['user']['uuid']
+        })
+        if (user.length) {
+            user = user[0];
+        } else {
+            user = new User({
+                uuid: message['user']['uuid'],
+                blind: 0,
+                hand: 0,
+                open: 0
+            })
+            user_collection.add(user);
+        }
+        user.set('nickname', message['user']['nickname'])
+    });
+
+
+    $('#nickname').change(function(evt) {
+        current_user.set('nickname', $('#nickname').val());
+        socket.emit('nickname', {
+            room: '{{ table.uuid }}',
+            user: current_user
+        });
     });
 
     $('.draw-button').click(function(evt) {

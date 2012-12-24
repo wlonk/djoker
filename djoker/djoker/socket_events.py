@@ -33,6 +33,11 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
         self.join(room)
         return True
 
+    def on_nickname(self, msg):
+        room = msg['room']
+        self.emit_to_all_in_room(room, 'nickname', msg)
+        return True
+
     def on_draw(self, msg):
         room = msg['room']
         self.emit_to_all_in_room(room, 'draw', msg)
