@@ -28,9 +28,10 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
             if room_name in socket.session['rooms']:
                 socket.send_packet(pkt)
 
-    def on_join(self, room):
-        self.room = room
-        self.join(room)
+    def on_join(self, msg):
+        self.room = msg['room']
+        self.join(msg['room'])
+        self.emit_to_all_in_room(msg['room'], 'nickname', msg)
         return True
 
     def on_nickname(self, msg):

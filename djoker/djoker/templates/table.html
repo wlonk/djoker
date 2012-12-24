@@ -119,7 +119,10 @@ $(document).ready(function() {
 
     //------
 
-    socket.emit('join', '{{ table.uuid }}');
+    socket.emit('join', {
+        room: '{{ table.uuid }}',
+        user: current_user
+    });
     socket.on('draw', function(message) {
         // Get the user
         // Find or create in the collection
