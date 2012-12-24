@@ -35,5 +35,5 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
     def on_draw(self, msg):
         room = msg['room']
-        self.emit_to_all_in_room(room, 'draw', 'Draw! {0}'.format(msg['action']))
+        self.emit_to_all_in_room(room, 'draw', msg)
         return True

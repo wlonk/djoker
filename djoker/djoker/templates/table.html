@@ -66,7 +66,10 @@ $(document).ready(function() {
         }
     });
     current_user = new User({
-        uuid: $.cookie('uuid')
+        uuid: $.cookie('uuid'),
+        blind: 0,
+        hand: 0,
+        open: 0
     });
     // @todo and we need all the other users at load time.
     UserCollection = Backbone.Collection.extend({
@@ -126,12 +129,32 @@ $(document).ready(function() {
     socket.on('draw', function(message) {
         // Get the user
         // Find or create in the collection
+        var user = user_collection.where({
+            uuid: message['user']
+        });
+        if (user.length) {
+            // Modify the user.
+            user = user[0];
+        } else {
+            // Create the user
+            user = new User({
+                uuid: message['user'],
+                blind: 0,
+                hand: 0,
+                open: 0
+            });
+            user_collection.add(user);
+        }
         // Set all attributes appropriately
+        var action = message['action'];
+        var val = user.get(action);
+        user.set(action, val + 1);
     });
 
     $('.draw-button').click(function(evt) {
         var action = $(evt.target).data('action');
         socket.emit('draw', {
+            user: current_user.get('uuid'),
             action: action,
             room: '{{ table.uuid }}'
         });
