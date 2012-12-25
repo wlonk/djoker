@@ -2,6 +2,37 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 
+SUITS = (
+    # '\xE2\x99\xA0',  # Spades
+    # '\xE2\x99\xA3',  # Clubs
+    # '\xE2\x99\xA5',  # Hearts
+    # '\xE2\x99\xA6',  # Diamonds
+    'Spades',
+    'Clubs',
+    'Hearts',
+    'Diamonds',
+)
+
+VALUES = (
+    'Ace',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    'Jack',
+    'Queen',
+    'King',
+)
+
+CARD_FORMAT = "{0} of {1}"
+
+
 class EphemeralUser(models.Model):
     uuid = models.CharField(max_length=36, primary_key=True)
     name = models.CharField(max_length=36)
@@ -55,9 +86,7 @@ class Hand(models.Model):
             )
         if self.kind == self.OPEN \
         or (self.kind == self.HAND and self.user == user):
-            return ', '.join(
-                map(unicode, self.card_set.all())
-            ) or '0 cards'
+            return map(unicode, self.card_set.all()) or '0 cards'
 
 
 class Card(models.Model):

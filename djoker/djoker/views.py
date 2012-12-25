@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404, redirect
-from cards.models import Table, EphemeralUser, Hand, Card
+from cards.models import (Table, EphemeralUser, Hand, Card,
+    SUITS, VALUES, CARD_FORMAT)
 
 
 def root(request):
@@ -68,11 +69,11 @@ def create_table(request):
         table=table
     )
     # Populate DECK with 52 cards.
-    for suit in ('Spades', 'Hearts', 'Clubs', 'Diamonds'):
-        for value in ['Ace'] + map(str, range(2, 11)) + ['Jack', 'Queen', 'King']:
+    for suit in SUITS:
+        for value in VALUES:
             Card.objects.create(
                 hand=deck_hand,
-                name="{0} of {1}".format(
+                name=CARD_FORMAT.format(
                     value,
                     suit
                 )
