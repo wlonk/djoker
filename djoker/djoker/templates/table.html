@@ -233,13 +233,15 @@ $(document).ready(function() {
             <dd>
                 <% var hand = user.get('hand') %>
                 <% if (typeof hand == 'object') { %>
+                    <ul>
                     <% for (var i = 0; i < hand.length; i++) { %>
-                        <%= hand[i] %>
+                        <li><%= hand[i] %>
                         <% if (user == current_user && user.get('hand').length > 0) { %>
                             <a href="#" class="move" data-target="open" data-origin="hand" data-card="<%= hand[i] %>">open</a>
                             <a href="#" class="move" data-target="discard" data-origin="hand" data-card="<%= hand[i] %>">x</a>
-                        <% } %>
+                        <% } %></li>
                     <% } %>
+                    </ul>
                 <% } else { %>
                     <%= hand %>
                 <% } %>
@@ -248,12 +250,14 @@ $(document).ready(function() {
             <dd>
                 <% var open = user.get('open') %>
                 <% if (typeof open == 'object') { %>
+                    <ul>
                     <% for (var i = 0; i < open.length; i++) { %>
-                        <%= open[i] %>
+                        <li><%= open[i] %>
                         <% if (user == current_user && user.get('open').length > 0) { %>
                             <a href="#" class="move" data-target="discard" data-origin="open" data-card="<%= open[i] %>">x</a>
-                        <% } %>
+                        <% } %></li>
                     <% } %>
+                    </ul>
                 <% } else { %>
                     <%= open %>
                 <% } %>

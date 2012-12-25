@@ -11,6 +11,10 @@ SUITS = (
     'Clubs',
     'Hearts',
     'Diamonds',
+    # '&spades;',
+    # '&clubs;',
+    # '&hearts;',
+    # '&diams;',
 )
 
 VALUES = (
