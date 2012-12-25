@@ -74,6 +74,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
+# @todo: regenerate this, draw it from an environment variable
 SECRET_KEY = 'x(j@@qq&amp;+2l(o%$o1k_g+6xnjb8*n376$do#2kwxp05q!g^sf0'
 
 # List of callables that know how to import templates from various sources.
