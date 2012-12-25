@@ -6,7 +6,7 @@ from socketio.sdjango import namespace
 
 from cards.models import Table, Hand, Card, EphemeralUser
 
-@namespace('')
+@namespace('/table')
 class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
     nicknames = []
 
@@ -39,6 +39,7 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
         Hand.objects.get_or_create(kind=Hand.BLIND, table=table, user=user)
         Hand.objects.get_or_create(kind=Hand.HAND, table=table, user=user)
         Hand.objects.get_or_create(kind=Hand.OPEN, table=table, user=user)
+        self.socket.session['user'] = user
         self.emit_to_all_in_room(msg['room'], 'nickname', msg)
         return True
 
@@ -58,25 +59,29 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
         )
         Card.objects.create(name='Ace of Spades', hand=hand)
         # Mung message as called for, per user
+        room = msg['room']
+        room_name = self._get_room_name(room)
         users_in_room = set(h.user
             for h in table.hand_set.select_related('user'))
-        to_emit = {}
         for u in users_in_room:
             hand_to_display = hand.to_string_by_user(u)
             # Emit hand to display to given user.
-            to_emit[user] = {
-                'user': user.uuid,
-                'kind': msg['kind'],
-                'hand': hand_to_display
-            }
-        # room = msg['room']
-        # room_name = self._get_room_name(room)
-        # for user, event in to_emit.items():
-        #     pkt = dict(
-        #         type="event",
-        #         name="draw",
-        #         args=data,
-        #         endpoint=self.ns_name
-        #     )
-        #     user.sockets[room_name].send_packet(pkt)
+            pkt = dict(
+                type="event",
+                name="draw",
+                args={
+                    'user': user.uuid,
+                    'kind': msg['kind'],
+                    'hand': hand_to_display
+                },
+                endpoint=self.ns_name
+            )
+            for sessid, socket in self.socket.server.sockets.iteritems():
+                if 'rooms' not in socket.session:
+                    continue
+                if 'user' not in socket.session:
+                    continue
+                if (room_name in socket.session['rooms']
+                    and u == socket.session['user']):
+                    socket.send_packet(pkt)
         return True

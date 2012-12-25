@@ -24,7 +24,7 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.2/jquery.cookie.min.js"></script>
         <script>
         //socket = io.connect(null, { transports: ['flashsocket', 'xhr-polling'] });
-        socket = io.connect();
+        socket = io.connect('/table');
         socket.on('connect', function() {
             console.log('connected');
         });
