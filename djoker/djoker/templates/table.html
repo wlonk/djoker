@@ -55,9 +55,9 @@ $(document).ready(function() {
     User = Backbone.Model.extend({
         defaults: {
             nickname: '',
-            blind: 0,
-            hand: 0,
-            open: 0
+            blind: [],
+            hand: [],
+            open: []
         },
         clipped_uuid: function() {
             var uuid = this.get('uuid');
@@ -72,7 +72,7 @@ $(document).ready(function() {
         }
     });
     current_user = new User({
-        uuid: $.cookie('uuid')
+        uuid: $.cookie('current_user')
     });
     // @todo and we need all the other users at load time.
     UserCollection = Backbone.Collection.extend({
@@ -128,7 +128,9 @@ $(document).ready(function() {
         room: '{{ table.uuid }}',
         user: current_user
     });
+
     socket.on('draw', function(message) {
+        console.log(message);
         // Get the user
         // Find or create in the collection
         var user = user_collection.where({
@@ -148,9 +150,9 @@ $(document).ready(function() {
             user_collection.add(user);
         }
         // Set all attributes appropriately
-        var action = message['action'];
-        var val = user.get(action);
-        user.set(action, val + 1);
+        var kind = message['kind'];
+        var val = user.get(kind);
+        user.set(kind, message['hand']);
     });
     socket.on('nickname', function(message) {
         var user = user_collection.where({
@@ -180,10 +182,10 @@ $(document).ready(function() {
     });
 
     $('.draw-button').click(function(evt) {
-        var action = $(evt.target).data('action');
+        var kind = $(evt.target).data('kind');
         socket.emit('draw', {
             user: current_user.get('uuid'),
-            action: action,
+            kind: kind,
             room: '{{ table.uuid }}'
         });
     });
@@ -214,9 +216,9 @@ $(document).ready(function() {
     Nickname: <input id="nickname" type="text" />
 </div>
 <div class="btn-group">
-    <button class="btn draw-button" data-action="blind">Blind draw</button>
-    <button class="btn draw-button" data-action="hand">Hand draw</button>
-    <button class="btn draw-button" data-action="open">Open draw</button>
+    <button class="btn draw-button" data-kind="blind">Blind draw</button>
+    <button class="btn draw-button" data-kind="hand">Hand draw</button>
+    <button class="btn draw-button" data-kind="open">Open draw</button>
 </div>
 <div id="user_list">
 </div>

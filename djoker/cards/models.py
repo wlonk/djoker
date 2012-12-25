@@ -27,15 +27,33 @@ class Table(models.Model):
 
 
 class Hand(models.Model):
+    BLIND = 'blind'
+    HAND = 'hand'
+    OPEN = 'open'
+
     KINDS = (
-        ('none', 'Blind'),
-        ('one', 'Hand'),
-        ('all', 'Open'),
+        (BLIND, 'Blind'),
+        (HAND, 'Hand'),
+        (OPEN, 'Open'),
     )
 
     table = models.ForeignKey(Table)
     user = models.ForeignKey(EphemeralUser)
-    kind = models.CharField(max_length=4, choices=KINDS)
+    kind = models.CharField(max_length=8, choices=KINDS)
+
+    def to_string_by_user(self, user):
+        if self.kind == self.BLIND \
+        or (self.kind == self.HAND and self.user != user):
+            count = self.card_set.count()
+            return '{0} card{1}'.format(
+                count,
+                '' if count == 1 else 's'
+            )
+        if self.kind == self.OPEN \
+        or (self.kind == self.HAND and self.user == user):
+            return ', '.join(
+                map(unicode, self.card_set.all())
+            ) or '0 cards'
 
 
 class Card(models.Model):
