@@ -7,8 +7,9 @@ from socketio.mixins import RoomsMixin, BroadcastMixin
 from socketio.sdjango import namespace
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
-from cards.models import Table, Hand, Card, EphemeralUser
+from cards.models import Table, Hand, EphemeralUser
 
 @namespace('/table')
 class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
@@ -113,5 +114,77 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
                     and u == socket.session['user']):
                     socket.send_packet(pkt)
                     socket.send_packet(pkt2)
-        self.emit_to_all_in_room(room_name, 'draw', )
+        return True
+
+    def on_move(self, msg):
+        try:
+            user = EphemeralUser.objects.get(uuid=msg['user'])
+            table = Table.objects.get(uuid=msg['room'])
+            origin = Hand.objects.get(
+                user=user,
+                table=table,
+                kind=msg['origin']
+            )
+            if msg['destination'] == 'discard':
+                destination = Hand.objects.get(
+                    user__uuid=settings.DISCARD,
+                    table=table,
+                    kind=Hand.OPEN
+                )
+            else:
+                destination = Hand.objects.get(
+                    user=user,
+                    table=table,
+                    kind=msg['destination']
+                )
+        except ObjectDoesNotExist:
+            print "PANICKING"
+            return True
+        # Get card, move from origin to destination
+        if msg['origin'] == 'blind':
+            # grab the first
+            card = origin.card_set.all()[0]
+        else:
+            # grab the named card
+            card = origin.card_set.get(name=msg['card'])
+        card.hand = destination
+        card.save()
+        # Mung message as called for, per user
+        room = msg['room']
+        room_name = self._get_room_name(room)
+        users_in_room = set(h.user
+            for h in table.hand_set.select_related('user'))
+        for u in users_in_room:
+            hand_to_display = origin.to_string_by_user(u)
+            # Emit hand to display to given user.
+            pkt = dict(
+                type="event",
+                name="draw",
+                args={
+                    'user': origin.user.uuid,
+                    'kind': origin.kind,
+                    'hand': hand_to_display
+                },
+                endpoint=self.ns_name
+            )
+            destination_to_display = destination.to_string_by_user(u)
+            pkt2 = dict(
+                type="event",
+                name="draw",
+                args={
+                    'user': destination.user.uuid,
+                    'kind': destination.kind,
+                    'hand': destination_to_display
+                },
+                endpoint=self.ns_name
+            )
+            for sessid, socket in self.socket.server.sockets.iteritems():
+                if 'rooms' not in socket.session:
+                    continue
+                if 'user' not in socket.session:
+                    continue
+                if (room_name in socket.session['rooms']
+                    and u == socket.session['user']):
+                    socket.send_packet(pkt)
+                    socket.send_packet(pkt2)
         return True

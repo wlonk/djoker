@@ -135,7 +135,6 @@ $(document).ready(function() {
     });
 
     socket.on('draw', function(message) {
-        console.log(message);
         // Get the user
         // Find or create in the collection
         var user = user_collection.where({
@@ -148,9 +147,9 @@ $(document).ready(function() {
             // Create the user
             user = new User({
                 uuid: message['user'],
-                blind: 0,
-                hand: 0,
-                open: 0
+                blind: [],
+                hand: [],
+                open: []
             });
             user_collection.add(user);
         }
@@ -169,9 +168,9 @@ $(document).ready(function() {
         } else {
             user = new User({
                 uuid: message['user']['uuid'],
-                blind: 0,
-                hand: 0,
-                open: 0
+                blind: [],
+                hand: [],
+                open: []
             })
             user_collection.add(user);
         }
@@ -195,6 +194,20 @@ $(document).ready(function() {
             room: '{{ table.uuid }}'
         });
     });
+
+    $('body').on('click', '.move', function(evt) {
+        var card = $(evt.target).data('card');
+        var origin = $(evt.target).data('origin');
+        var destination = $(evt.target).data('target');
+        socket.emit('move', {
+            user: current_user.get('uuid'),
+            room: '{{ table.uuid }}',
+            origin: origin,
+            destination: destination,
+            card: card
+        });
+        return false;
+    });
 });
 </script>
 
@@ -207,11 +220,44 @@ $(document).ready(function() {
     <h2><%= user.display_name() %></h2>
     <dl>
         <dt>Blind</dt>
-        <dd><%= user.get('blind') %></dd>
+            <dd>
+                <% var blind = user.get('blind') %>
+                <%= blind %>
+                <% if (user == current_user && user.get('blind') != '0 cards') { %>
+                    <a href="#" class="move" data-target="hand" data-origin="blind" data-card="?">hand</a>
+                    <a href="#" class="move" data-target="open" data-origin="blind" data-card="?">open</a>
+                    <a href="#" class="move" data-target="discard" data-origin="blind" data-card="?">x</a>
+                <% } %>
+            </dd>
         <dt>Hand</dt>
-        <dd><%= user.get('hand') %></dd>
+            <dd>
+                <% var hand = user.get('hand') %>
+                <% if (typeof hand == 'object') { %>
+                    <% for (var i = 0; i < hand.length; i++) { %>
+                        <%= hand[i] %>
+                        <% if (user == current_user && user.get('hand').length > 0) { %>
+                            <a href="#" class="move" data-target="open" data-origin="hand" data-card="<%= hand[i] %>">open</a>
+                            <a href="#" class="move" data-target="discard" data-origin="hand" data-card="<%= hand[i] %>">x</a>
+                        <% } %>
+                    <% } %>
+                <% } else { %>
+                    <%= hand %>
+                <% } %>
+            </dd>
         <dt>Open</dt>
-        <dd><%= user.get('open') %></dd>
+            <dd>
+                <% var open = user.get('open') %>
+                <% if (typeof open == 'object') { %>
+                    <% for (var i = 0; i < open.length; i++) { %>
+                        <%= open[i] %>
+                        <% if (user == current_user && user.get('open').length > 0) { %>
+                            <a href="#" class="move" data-target="discard" data-origin="open" data-card="<%= open[i] %>">x</a>
+                        <% } %>
+                    <% } %>
+                <% } else { %>
+                    <%= open %>
+                <% } %>
+            </dd>
     </dl>
 </script>
 {% endblock %}
