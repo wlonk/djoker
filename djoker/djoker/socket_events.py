@@ -45,6 +45,12 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
 
     def on_nickname(self, msg):
         room = msg['room']
+        try:
+            user = EphemeralUser.objects.get(uuid=msg['user']['uuid'])
+            user.name = msg['user']['nickname']
+            user.save()
+        except EphemeralUser.DoesNotExist:
+            pass
         self.emit_to_all_in_room(room, 'nickname', msg)
         return True
 

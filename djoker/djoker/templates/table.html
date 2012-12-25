@@ -71,10 +71,6 @@ $(document).ready(function() {
             }
         }
     });
-    current_user = new User({
-        uuid: $.cookie('current_user')
-    });
-    // @todo and we need all the other users at load time.
     UserCollection = Backbone.Collection.extend({
         model: User
     });
@@ -82,6 +78,15 @@ $(document).ready(function() {
         return new User(x);
     });
     user_collection = new UserCollection(other_users);
+    current_user = user_collection.where({
+        uuid: $.cookie('current_user')
+    });
+    if (current_user.length == 1) {
+        current_user = current_user[0];
+        $('#nickname').val(current_user.get('nickname'));
+    } else {
+        current_user = undefined;
+    }
 
 
     UpdatingUserView = Backbone.View.extend({
@@ -154,6 +159,7 @@ $(document).ready(function() {
         var val = user.get(kind);
         user.set(kind, message['hand']);
     });
+
     socket.on('nickname', function(message) {
         var user = user_collection.where({
             uuid: message['user']['uuid']
