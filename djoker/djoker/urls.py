@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 import socketio.sdjango
 
-from .views import root, table
+from .views import root, table, create_table
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -19,8 +19,9 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
     url(r'^$', root, name='root'),
-    url(r'^(?P<uuid>[^/]+)/$', table, name='table'),
     url(r'^socket\.io', include(socketio.sdjango.urls)),
+    url(r'^create-table/$', create_table, name='create-table'),
+    url(r'^(?P<uuid>[^/]+)/$', table, name='table'),
 
 )
 

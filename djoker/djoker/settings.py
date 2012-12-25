@@ -149,3 +149,6 @@ LOGGING = {
         },
     }
 }
+
+DECK = "c89b3172-7e4f-4d74-bbf4-1551e383a36c"
+DISCARD = "8d648c49-dfee-408b-b578-3dfffab34649"

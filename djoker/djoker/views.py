@@ -2,8 +2,9 @@ import json
 from uuid import uuid4
 from datetime import datetime, timedelta
 
-from django.shortcuts import render_to_response, get_object_or_404
-from cards.models import Table, EphemeralUser, Hand
+from django.conf import settings
+from django.shortcuts import render_to_response, get_object_or_404, redirect
+from cards.models import Table, EphemeralUser, Hand, Card
 
 
 def root(request):
@@ -45,3 +46,35 @@ def table(request, uuid):
         resp.set_cookie('current_user', user_uuid,
             expires=datetime.now() + timedelta(days=365))
     return resp
+
+
+def create_table(request):
+    table = Table.objects.create(uuid=str(uuid4()))
+    # The Deck and Discard special users are known-to-exist
+    deck = EphemeralUser.objects.get(
+        uuid=settings.DECK
+    )
+    discard = EphemeralUser.objects.get(
+        uuid=settings.DISCARD
+    )
+    deck_hand = Hand.objects.create(
+        kind=Hand.BLIND,
+        user=deck,
+        table=table
+    )
+    Hand.objects.create(
+        kind=Hand.OPEN,
+        user=discard,
+        table=table
+    )
+    # Populate DECK with 52 cards.
+    for suit in ('Spades', 'Hearts', 'Clubs', 'Diamonds'):
+        for value in ['Ace'] + map(str, range(2, 11)) + ['Jack', 'Queen', 'King']:
+            Card.objects.create(
+                hand=deck_hand,
+                name="{0} of {1}".format(
+                    value,
+                    suit
+                )
+            )
+    return redirect(table)

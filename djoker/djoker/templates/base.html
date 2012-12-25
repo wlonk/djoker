@@ -64,6 +64,7 @@
             {% for table in tables %}
                 <li><a href="{{ table.uuid }}">{{ table.uuid }}</a></li>
             {% endfor %}
+                <li><a href="{% url create-table %}">New table</a></li>
             </ul>
             {% endblock %}
         </div>

@@ -1,8 +1,12 @@
 import logging
 
+from random import randint
+
 from socketio.namespace import BaseNamespace
 from socketio.mixins import RoomsMixin, BroadcastMixin
 from socketio.sdjango import namespace
+
+from django.conf import settings
 
 from cards.models import Table, Hand, Card, EphemeralUser
 
@@ -63,7 +67,14 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
             user=user,
             kind=msg['kind']
         )
-        Card.objects.create(name='Ace of Spades', hand=hand)
+        # Get card from Deck.
+        deck = table.hand_set.get(kind=Hand.BLIND, user__uuid=settings.DECK)
+        deck_count = deck.card_set.count()
+        if not deck_count:
+            return
+        card = deck.card_set.all()[randint(0, deck_count - 1)]
+        card.hand = hand
+        card.save()
         # Mung message as called for, per user
         room = msg['room']
         room_name = self._get_room_name(room)
@@ -82,6 +93,17 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
                 },
                 endpoint=self.ns_name
             )
+            deck_to_display = deck.to_string_by_user(u)
+            pkt2 = dict(
+                type="event",
+                name="draw",
+                args={
+                    'user': deck.user.uuid,
+                    'kind': Hand.BLIND,
+                    'hand': deck_to_display
+                },
+                endpoint=self.ns_name
+            )
             for sessid, socket in self.socket.server.sockets.iteritems():
                 if 'rooms' not in socket.session:
                     continue
@@ -90,4 +112,6 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
                 if (room_name in socket.session['rooms']
                     and u == socket.session['user']):
                     socket.send_packet(pkt)
+                    socket.send_packet(pkt2)
+        self.emit_to_all_in_room(room_name, 'draw', )
         return True

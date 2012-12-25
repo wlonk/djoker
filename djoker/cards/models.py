@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.urlresolvers import reverse
 
 
 class EphemeralUser(models.Model):
@@ -24,6 +25,9 @@ class Table(models.Model):
 
     def __unicode__(self):
         return 'Table {0}'.format(self.uuid)
+
+    def get_absolute_url(self):
+        return reverse('table', args=(self.uuid,))
 
 
 class Hand(models.Model):
