@@ -1,5 +1,6 @@
 import json
 from uuid import uuid4
+from datetime import datetime, timedelta
 
 from django.shortcuts import render_to_response, get_object_or_404
 from cards.models import Table, EphemeralUser, Hand
@@ -41,5 +42,6 @@ def table(request, uuid):
         'users': json.dumps(users.values())
     })
     if set_cookie:
-        resp.set_cookie('current_user', user_uuid)
+        resp.set_cookie('current_user', user_uuid,
+            expires=datetime.now() + timedelta(days=365))
     return resp
