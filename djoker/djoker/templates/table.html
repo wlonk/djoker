@@ -55,9 +55,9 @@ $(document).ready(function() {
     User = Backbone.Model.extend({
         defaults: {
             nickname: '',
-            blind: [],
-            hand: [],
-            open: []
+            blind: '0 cards',
+            hand: '0 cards',
+            open: '0 cards'
         },
         clipped_uuid: function() {
             var uuid = this.get('uuid');
@@ -146,10 +146,7 @@ $(document).ready(function() {
         } else {
             // Create the user
             user = new User({
-                uuid: message['user'],
-                blind: [],
-                hand: [],
-                open: []
+                uuid: message['user']
             });
             user_collection.add(user);
         }
@@ -167,10 +164,7 @@ $(document).ready(function() {
             user = user[0];
         } else {
             user = new User({
-                uuid: message['user']['uuid'],
-                blind: [],
-                hand: [],
-                open: []
+                uuid: message['user']['uuid']
             })
             user_collection.add(user);
         }
