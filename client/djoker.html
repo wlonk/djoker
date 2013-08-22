@@ -1,0 +1,54 @@
+<head>
+  <title>djoker</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="masthead">
+      <div class="pull-right">
+        {{loginButtons align="right"}}
+      </div>
+      <h3 class="muted">djoker</h3>
+    </div>
+
+    <hr>
+
+    <div class="row">
+      {{> table}}
+    </div>
+  </div>
+</body>
+
+<template name="table">
+  {{#each piles}}
+    <div class="pile-wrapper">
+      <span class="pile-name">{{name}}</span>
+      <div class="pile clearfix">
+        {{#if visible userId owner visibleTo}}
+          {{#each cards}}
+            <div class="card {{suit}}">
+              {{value}}
+            </div>
+          {{/each}}
+        {{else}}
+          {{#each cards}}
+          <div class="card facedown">
+            ?
+          </div>
+          {{/each}}
+        {{/if}}
+      </div>
+      <div class="pile-controls button-toolbar pull-right">
+        <div class="btn-group">
+          <button class="btn btn-small move-to-here"><i class="icon-download"></i></button>
+          <button class="btn btn-small reveal-this-pile"><i class="icon-eye-open"></i></button>
+          <button class="btn btn-small adjust-visibility-on-this-pile"><i class="icon-adjust"></i></button>
+          <button class="btn btn-small facedown-this-pile"><i class="icon-eye-close"></i></button>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-small btn-danger trash-this-pile"><i class="icon-trash"></i></button>
+        </div>
+      </div>
+    </div>
+  {{/each}}
+</template>
