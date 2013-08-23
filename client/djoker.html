@@ -3,16 +3,20 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="masthead">
-      <div class="pull-right">
-        {{loginButtons align="right"}}
-      </div>
-      <h3 class="muted">djoker</h3>
+  <div class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" href="#">djoker</a>
+      <ul class="nav pull-right">
+        <li>
+          <a>
+            {{loginButtons align="right"}}
+          </a>
+        </li>
+      </ul>
     </div>
+  </div>
 
-    <hr>
-
+  <div class="container">
     <div class="row">
       {{> table}}
     </div>
@@ -23,6 +27,18 @@
   {{#if showAdjustVisibilityDialog}}
     {{> adjustVisibilityDialog}}
   {{/if}}
+
+  {{#if loggedIn userId}}
+    {{#if showCreatePileDialog}}
+      {{> createPileDialog}}
+    {{/if}}
+  {{/if}}
+
+  {{#if loggedIn userId}}
+    <button class="btn btn-primary create-pile">create pile</button>
+  {{/if}}
+
+  <div class="clearfix"></div>
 
   {{#each piles}}
     <div class="pile-wrapper">
@@ -83,6 +99,43 @@
 
     <div class="modal-footer">
       <button class="btn btn-primary save">Save</button>
+      <button class="btn btn-primary done">Cancel</button>
+    </div>
+  </div>
+</template>
+
+<template name="createPileDialog">
+  <div class="modal">
+    <div class="modal-header">
+      <button type="button" class="close done">&times;</button>
+      <h3>Create pile</h3>
+    </div>
+
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <fieldset>
+          <div class="control-group">
+            <label class="control-label" for="name">Pile name</label>
+            <div class="controls">
+              <input type="text" id="name" name="name" placeholder="Deck">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="deck">Pile type</label>
+            <div class="controls">
+              <select id="deck" name="deck">
+                {{#each deck_types}}
+                  <option value="{{value}}">{{name}}</option>
+                {{/each}}
+              </select>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary save">Create</button>
       <button class="btn btn-primary done">Cancel</button>
     </div>
   </div>

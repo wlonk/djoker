@@ -4,23 +4,19 @@ Meteor.subscribe("userData");
 
 Session.setDefault("selectedCards", {});
 Session.setDefault("showAdjustVisibilityDialog", false);
+Session.setDefault("showCreatePileDialog", false);
 Session.setDefault("adjustVisibilityDialogPile", null);
 Session.setDefault("adjustVisibilityDialogChecklist", []);
-
-var openAdjustVisibilityDialog = function (pileId) {
-  Session.set("adjustVisibilityDialogPile", pileId);
-  Session.set("showAdjustVisibilityDialog", true);
-};
-
-var visible = function (userId, visibleTo) {
-  return _.contains(visibleTo, userId) || _.contains(visibleTo, '*');
-}
-
-Template.table.userId = Meteor.userId;
 
 Template.table.showAdjustVisibilityDialog = function () {
   return Session.get("showAdjustVisibilityDialog");
 }
+
+Template.table.showCreatePileDialog = function () {
+  return Session.get("showCreatePileDialog");
+}
+
+Template.table.userId = Meteor.userId;
 
 Template.table.piles = function () {
   return Piles.find().map(function (pile) {
@@ -29,11 +25,28 @@ Template.table.piles = function () {
   });
 }
 
+var openAdjustVisibilityDialog = function (pileId) {
+  Session.set("adjustVisibilityDialogPile", pileId);
+  Session.set("showAdjustVisibilityDialog", true);
+};
+
+var openCreatePileDialog = function (pileId) {
+  Session.set("showCreatePileDialog", true);
+};
+
+var visible = function (userId, visibleTo) {
+  return _.contains(visibleTo, userId) || _.contains(visibleTo, '*');
+}
+
 Template.table.visible = visible;
 
 Template.table.inSelected = function (cardId) {
   var selectedCards = Session.get('selectedCards');
-  return !(typeof selectedCards[this._id] === 'undefined')
+  return !(_.isUndefined(selectedCards[this._id]))
+}
+
+Template.table.loggedIn = function (userId) {
+  return !!userId;
 }
 
 Template.table.pileVisibility = function (visibleTo, mode) {
@@ -52,7 +65,7 @@ Template.table.pileVisibility = function (visibleTo, mode) {
 Template.table.events({
   'click .card': function (evt) {
     var selectedCards = Session.get('selectedCards');
-    if (typeof selectedCards[this._id] === 'undefined') {
+    if (_.isUndefined(selectedCards[this._id])) {
       selectedCards[this._id] = this;
     } else {
       delete selectedCards[this._id];
@@ -62,7 +75,7 @@ Template.table.events({
 
   'click .move-to-here': function (evt) {
     var toPileId = this._id;
-    var cardIdArray = Object.keys(Session.get('selectedCards'));
+    var cardIdArray = _.keys(Session.get('selectedCards'));
     Meteor.call('moveCards', toPileId, cardIdArray);
     Session.set('selectedCards', {});
   },
@@ -80,7 +93,11 @@ Template.table.events({
   },
 
   'click .trash-this-pile': function (evt) {
-    console.log('trash this');
+    Piles.remove({_id: this._id});
+  },
+
+  'click .create-pile': function (evt) {
+    openCreatePileDialog();
   }
 });
 
@@ -114,5 +131,29 @@ Template.adjustVisibilityDialog.events({
   'click .done': function (evt) {
     Session.set("showAdjustVisibilityDialog", false);
     return false;
+  }
+});
+
+Template.createPileDialog.deck_types = function () {
+  return _.map(_.keys(deck_types), function (e) {
+    return {
+      name: e,
+      value: e
+    };
+  });
+}
+
+Template.createPileDialog.events({
+  'click .save': function (evt) {
+    var name = $('#name').val();
+    var deck = $('#deck').val();
+    Meteor.call('createPile', {name: name, deck: deck});
+    Session.set("showCreatePileDialog", false);
+    return false;
+  },
+
+  'click .done': function (evt) {
+    Session.set("showCreatePileDialog", false);
+    return false
   }
 });

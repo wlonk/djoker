@@ -10,7 +10,7 @@ var NonEmptyString = Match.Where(function (x) {
 
 var ValidDeck = Match.Where(function (x) {
   check(x, String);
-  return _.contains(Object.keys(deck_types), x);
+  return _.contains(_.keys(deck_types), x);
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ var spades = '\u2660',
      diams = '\u2666',
      joker = 'Jo';
 
-var deck_types = {
+deck_types = {
   'empty': [],
   '52': [
     {value:  "A" + clubs,   suit: "clubs"},
