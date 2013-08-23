@@ -13,7 +13,6 @@ var openAdjustVisibilityDialog = function (pileId) {
 };
 
 var visible = function (userId, visibleTo) {
-  console.log(userId, visibleTo);
   return _.contains(visibleTo, userId) || _.contains(visibleTo, '*');
 }
 
