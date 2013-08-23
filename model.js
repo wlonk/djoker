@@ -113,16 +113,14 @@ Meteor.methods({
     }
 
     check(options, {
-      name: NonEmptyString,
-      public: Match.Optional(Boolean)
+      name: NonEmptyString
     });
 
     return Piles.insert({
       owner: this.userId,
       name: options.name,
-      public: !! options.public,
       cards: ids,
-      visibleTo: []
+      visibleTo: [this.userId]
     });
   },
 
@@ -130,13 +128,23 @@ Meteor.methods({
     //pass
   },
 
-  moveCard: function (fromPileId, toPileId, cardId) {
-    Piles.update({_id: fromPileId}, {$pull: {'cards._id': cardId}});
-    Piles.update({_id: toPileId}, {$push: {cards: {_id: cardId, value: cardValue}}});
+  moveCards: function (toPileId, cardIdArray) {
+    for (var i = 0; i < cardIdArray.length; i++) {
+      var cardId = cardIdArray[i];
+      fromPileId = Piles.findOne({cards: cardId})._id;
+      Piles.update({_id: fromPileId}, {$pull: {cards: cardId}});
+      Piles.update({_id: toPileId}, {$push: {cards: cardId}});
+    }
   },
 
   setPileVisibility: function (pileId, visibilityList) {
     // @todo: add input checks
-    Piles.update({_id: pileId}, {visibleTo: visibilityList});
+    Piles.update({_id: pileId}, {$set: {visibleTo: visibilityList}});
   }
 });
+
+displayName = function (user) {
+  if (user.profile && user.profile.name)
+    return user.profile.name;
+  return user.emails[0].address;
+};

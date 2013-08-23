@@ -20,19 +20,23 @@
 </body>
 
 <template name="table">
+  {{#if showAdjustVisibilityDialog}}
+    {{> adjustVisibilityDialog}}
+  {{/if}}
+
   {{#each piles}}
     <div class="pile-wrapper">
       <span class="pile-name">{{name}}</span>
       <div class="pile clearfix">
-        {{#if visible userId owner visibleTo}}
+        {{#if visible userId visibleTo}}
           {{#each cards}}
-            <div class="card {{suit}}">
+            <div class="card {{suit}}{{#if inSelected _id}} selected{{/if}}">
               {{value}}
             </div>
           {{/each}}
         {{else}}
           {{#each cards}}
-          <div class="card facedown">
+          <div class="card facedown{{#if inSelected _id}} selected{{/if}}">
             ?
           </div>
           {{/each}}
@@ -51,4 +55,33 @@
       </div>
     </div>
   {{/each}}
+</template>
+
+<template name="adjustVisibilityDialog">
+  <div class="modal">
+    <div class="modal-header">
+      <button type="button" class="close done">&times;</button>
+      <h3>Adjust visibility</h3>
+    </div>
+
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <fieldset>
+          {{#each users}}
+            <div class="control-group">
+              <label class="control-label" for="user_{{_id}}">{{displayName}}</label>
+              <div class="controls">
+                <input type="checkbox" id="user_{{_id}}" name="user_{{_id}}" data-id="{{_id}}"{{#if isViewer _id pileId}} checked{{/if}}>
+              </div>
+            </div>
+          {{/each}}
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary save">Save</button>
+      <button class="btn btn-primary done">Cancel</button>
+    </div>
+  </div>
 </template>
