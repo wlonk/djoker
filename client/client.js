@@ -36,6 +36,19 @@ Template.table.inSelected = function (cardId) {
   return !(typeof selectedCards[this._id] === 'undefined')
 }
 
+Template.table.pileVisibility = function (visibleTo, mode) {
+  if (mode == 'all' && _.contains(visibleTo, '*')) {
+    return true;
+  }
+  if (mode == 'none' && visibleTo.length === 0) {
+    return true;
+  }
+  if (mode == 'some' && visibleTo.length > 0 && !_.contains(visibleTo, '*')) {
+    return true;
+  }
+  return false;
+}
+
 Template.table.events({
   'click .card': function (evt) {
     var selectedCards = Session.get('selectedCards');

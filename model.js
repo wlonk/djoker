@@ -11,7 +11,7 @@ var NonEmptyString = Match.Where(function (x) {
 var ValidDeck = Match.Where(function (x) {
   check(x, String);
   return _.contains(Object.keys(deck_types), x);
-})
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 // Piles
@@ -191,7 +191,9 @@ Meteor.methods({
   },
 
   shufflePile: function (pileId) {
-    //pass
+    var pile = Piles.findOne({_id: pileId});
+    var shuffled_cards = _.shuffle(pile.cards);
+    Piles.update({_id: pileId}, {$set: {cards: shuffled_cards}});
   },
 
   moveCards: function (toPileId, cardIdArray) {
