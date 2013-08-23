@@ -87,6 +87,10 @@ Template.table.events({
     Meteor.call('shufflePile', this._id);
   },
 
+  'click .sort': function (evt) {
+    Meteor.call('sortPile', this._id);
+  },
+
   'click .reveal-this-pile': function (evt) {
     Meteor.call('setPileVisibility', this._id, ['*']);
   },

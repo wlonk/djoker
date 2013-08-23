@@ -194,6 +194,17 @@ Meteor.methods({
     Piles.update({_id: pileId}, {$set: {cards: shuffled_cards}});
   },
 
+  sortPile: function (pileId) {
+    var pile = Piles.findOne({_id: pileId});
+    pile_cards = pile.cards.map(function (id) {
+      return Cards.findOne({_id: id});
+    });
+    sorted_cards = _.pluck(_.sortBy(pile_cards, function (card) {
+      return card.suit + card.value;
+    }), '_id');
+    Piles.update({_id: pileId}, {$set: {cards: sorted_cards}});
+  },
+
   moveCards: function (toPileId, cardIdArray) {
     for (var i = 0; i < cardIdArray.length; i++) {
       var cardId = cardIdArray[i];
