@@ -151,16 +151,14 @@ Cards.allow({
 
 Piles = new Meteor.Collection("piles");
 
-// @todo: everything is permitted for testing.
 Piles.allow({
   insert: function (userId, pile) {
-    return true; // no cowboy inserts -- use createParty method
+    return false; // no cowboy inserts -- use createParty method
   },
   update: function (userId, pile, fields, modifier) {
-    return true; // no cowboy updates -- use specific update methods
+    return false; // no cowboy updates -- use specific update methods
   },
   remove: function (userId, pile) {
-    return true;
     // You can only remove piles that you created and that have no cards
     return pile.owner === userId && pile.cards.length === 0;
   }
@@ -207,6 +205,9 @@ Meteor.methods({
 
   setPileVisibility: function (pileId, visibilityList) {
     // @todo: add input checks
+    if (_.contains(visibilityList, '*')) {
+      visibilityList = ['*'];
+    }
     Piles.update({_id: pileId}, {$set: {visibleTo: visibilityList}});
   }
 });

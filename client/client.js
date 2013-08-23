@@ -20,7 +20,10 @@ Template.table.userId = Meteor.userId;
 
 Template.table.piles = function () {
   return Piles.find().map(function (pile) {
-    pile.cards = Cards.find({_id: {$in: pile.cards}}).fetch();
+    // We use a map to preserve the order of the cards in the pile.
+    pile.cards = pile.cards.map(function (id) {
+      return Cards.findOne({_id: id});
+    });
     return pile;
   });
 }
@@ -78,6 +81,10 @@ Template.table.events({
     var cardIdArray = _.keys(Session.get('selectedCards'));
     Meteor.call('moveCards', toPileId, cardIdArray);
     Session.set('selectedCards', {});
+  },
+
+  'click .shuffle': function (evt) {
+    Meteor.call('shufflePile', this._id);
   },
 
   'click .reveal-this-pile': function (evt) {

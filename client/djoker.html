@@ -58,19 +58,22 @@
           {{/each}}
         {{/if}}
       </div>
-      <div class="pile-controls button-toolbar pull-right">
-        <div class="btn-group">
-          <button class="btn btn-small move-to-here"><i class="icon-download"></i></button>
+      {{#if loggedIn userId}}
+        <div class="pile-controls button-toolbar pull-right">
+          <div class="btn-group">
+            <button class="btn btn-small move-to-here"><i class="icon-download"></i></button>
+            <button class="btn btn-small shuffle"><i class="icon-random"></i></button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-small {{#if pileVisibility visibleTo "all"}}active {{/if}}reveal-this-pile"><i class="icon-eye-open"></i></button>
+            <button class="btn btn-small {{#if pileVisibility visibleTo "some"}}active {{/if}}adjust-visibility-on-this-pile"><i class="icon-adjust"></i></button>
+            <button class="btn btn-small {{#if pileVisibility visibleTo "none"}}active {{/if}}facedown-this-pile"><i class="icon-eye-close"></i></button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-small btn-danger trash-this-pile"><i class="icon-trash"></i></button>
+          </div>
         </div>
-        <div class="btn-group">
-          <button class="btn btn-small {{#if pileVisibility visibleTo "all"}}active {{/if}}reveal-this-pile"><i class="icon-eye-open"></i></button>
-          <button class="btn btn-small {{#if pileVisibility visibleTo "some"}}active {{/if}}adjust-visibility-on-this-pile"><i class="icon-adjust"></i></button>
-          <button class="btn btn-small {{#if pileVisibility visibleTo "none"}}active {{/if}}facedown-this-pile"><i class="icon-eye-close"></i></button>
-        </div>
-        <div class="btn-group">
-          <button class="btn btn-small btn-danger trash-this-pile"><i class="icon-trash"></i></button>
-        </div>
-      </div>
+      {{/if}}
     </div>
   {{/each}}
 </template>
@@ -117,7 +120,7 @@
           <div class="control-group">
             <label class="control-label" for="name">Pile name</label>
             <div class="controls">
-              <input type="text" id="name" name="name" placeholder="Deck">
+              <input type="text" id="name" name="name" placeholder="Deck" autofocus>
             </div>
           </div>
           <div class="control-group">
