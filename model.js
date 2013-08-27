@@ -8,6 +8,11 @@ var NonEmptyString = Match.Where(function (x) {
   return x.length !== 0;
 });
 
+var ValidTable = Match.Where(function (x) {
+  check(x, String);
+  return Tables.find({_id: x}).count() === 1;
+});
+
 var ValidDeck = Match.Where(function (x) {
   check(x, String);
   return _.contains(_.keys(deck_types), x);
@@ -164,11 +169,27 @@ Piles.allow({
   }
 });
 
+Tables = new Meteor.Collection("tables");
+
+// @todo: allow all right now.
+Tables.allow({
+  insert: function () {
+    return true;
+  },
+  update: function () {
+    return true;
+  },
+  remove: function () {
+    return true;
+  }
+})
+
 Meteor.methods({
   createPile: function (options) {
     if (! this.userId)
       throw new Meteor.Error(403, "You must be logged in");
     check(options, {
+      table: ValidTable,
       name: NonEmptyString,
       deck: ValidDeck
     });
@@ -181,6 +202,7 @@ Meteor.methods({
     }
 
     return Piles.insert({
+      table: options.table,
       owner: this.userId,
       name: options.name,
       cards: ids,

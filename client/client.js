@@ -1,5 +1,6 @@
 Meteor.subscribe("cards");
 Meteor.subscribe("piles");
+Meteor.subscribe("tables");
 Meteor.subscribe("userData");
 
 Session.setDefault("selectedCards", {});
@@ -7,6 +8,11 @@ Session.setDefault("showAdjustVisibilityDialog", false);
 Session.setDefault("showCreatePileDialog", false);
 Session.setDefault("adjustVisibilityDialogPile", null);
 Session.setDefault("adjustVisibilityDialogChecklist", []);
+Session.setDefault("tableId", null);
+
+Template.displayController.tableId = function () {
+  return Session.get("tableId");
+}
 
 Template.table.showAdjustVisibilityDialog = function () {
   return Session.get("showAdjustVisibilityDialog");
@@ -17,6 +23,21 @@ Template.table.showCreatePileDialog = function () {
 }
 
 Template.table.userId = Meteor.userId;
+
+var pilesHandle = null;
+// Always be subscribed to the piles for the selected table.
+Deps.autorun(function () {
+  var tableId = Session.get('tableId');
+  if (tableId) {
+    pilesHandle = Meteor.subscribe('piles', tableId);
+  } else {
+    pilesHandle = null;
+  }
+});
+
+Template.table.loading = function () {
+  return pilesHandle && !pilesHandle.ready();
+}
 
 Template.table.piles = function () {
   return Piles.find().map(function (pile) {
@@ -167,4 +188,44 @@ Template.createPileDialog.events({
     Session.set("showCreatePileDialog", false);
     return false
   }
+});
+
+Template.tableList.tables = function () {
+  return Tables.find();
+}
+
+Template.tableList.events({
+  'click a': function (evt) {
+    evt.preventDefault();
+    Router.setTable(this._id);
+  }
+})
+
+/**
+ * Routing and URLs and history, oh my.
+ */
+
+var DjokerRouter = Backbone.Router.extend({
+  routes: {
+    "": "home",
+    ":tableId": "main"
+  },
+  home: function () {
+    Session.set("tableId", null);
+  },
+  main: function (tableId) {
+    var oldTable = Session.get("tableId");
+    if (oldTable !== tableId) {
+      Session.set("tableId", tableId);
+    }
+  },
+  setTable: function (tableId) {
+    this.navigate(tableId, true);
+  }
+});
+
+Router = new DjokerRouter;
+
+Meteor.startup(function () {
+  Backbone.history.start({pushState: true});
 });

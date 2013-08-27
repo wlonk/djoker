@@ -5,7 +5,7 @@
 <body>
   <div class="navbar">
     <div class="navbar-inner">
-      <a class="brand" href="#">djoker</a>
+      <a class="brand" href="/">djoker</a>
       <ul class="nav pull-right">
         <li>
           <a>
@@ -17,11 +17,29 @@
   </div>
 
   <div class="container">
-    <div class="row">
-      {{> table}}
+    <div class="row-fluid">
+      <div class="span3">
+        {{> tableList}}
+      </div>
+      <div class="span9">
+        {{> displayController}}
+      </div>
     </div>
   </div>
 </body>
+
+<template name="displayController">
+  {{#if tableId}}
+    {{> table}}
+  {{else}}
+    {{> home}}
+  {{/if}}
+</template>
+
+<template name="home">
+  <h1>Djoker</h1>
+  <p>Welcome to Djoker!</p>
+</template>
 
 <template name="table">
   {{#if showAdjustVisibilityDialog}}
@@ -143,4 +161,13 @@
       <button class="btn btn-primary done">Cancel</button>
     </div>
   </div>
+</template>
+
+<template name="tableList">
+  <h2>Tables:</h2>
+  <ul>
+    {{#each tables}}
+      <li><a href="/{{_id}}">{{ name }}</a></li>
+    {{/each}}
+  </ul>
 </template>
