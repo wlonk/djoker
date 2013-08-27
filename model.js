@@ -242,6 +242,16 @@ Meteor.methods({
       visibilityList = ['*'];
     }
     Piles.update({_id: pileId}, {$set: {visibleTo: visibilityList}});
+  },
+
+  createTable: function (options) {
+    if (! this.userId)
+      throw new Meteor.Error(403, "You must be logged in");
+    check(options, {
+      name: NonEmptyString
+    });
+
+    return Tables.insert({name: options.name, public: true});
   }
 });
 

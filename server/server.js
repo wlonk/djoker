@@ -10,7 +10,12 @@ Meteor.publish("piles", function (tableId) {
 });
 
 Meteor.publish("tables", function () {
-  return Tables.find();
+  return Tables.find({
+    // $or: {
+      public: true
+      // user is member
+    // }
+  });
 })
 
 Meteor.publish("userData", function () {

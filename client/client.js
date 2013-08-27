@@ -94,7 +94,8 @@ Template.table.showCreatePileDialog = function () {
 }
 
 Template.table.tableName = function () {
-  return Tables.findOne({_id: Session.get("tableId")}).name;
+  var table = Tables.findOne({_id: Session.get("tableId")});
+  return _.isUndefined(table) ? "No such table" : table.name;
 }
 
 Template.table.piles = function () {
@@ -246,7 +247,9 @@ Template.createPileDialog.events({
 
 Template.createTableDialog.events({
   'click .save': function (evt) {
-    // Meteor.call('createTable', {});
+    var name = $('#name').val();
+    Meteor.call('createTable', {name: name});
+    // Router.navigate(newTableId, true);
     Session.set("showCreateTableDialog", false);
     return false;
   },
