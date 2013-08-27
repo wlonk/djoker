@@ -18,10 +18,10 @@
 
   <div class="container">
     <div class="row-fluid">
-      <div class="span3">
+      <div class="span2">
         {{> tableList}}
       </div>
-      <div class="span9">
+      <div class="span10">
         {{> displayController}}
       </div>
     </div>
@@ -61,17 +61,16 @@
     {{/if}}
   {{/if}}
 
-  <div id="table-header">
+  <div id="table-header" class="clearfix">
     {{#if loggedIn userId}}
       <div class="btn-group pull-right">
         <button class="btn btn-primary create-pile">create pile</button>
+        <button class="btn btn-info invite-to-table">invite to table</button>
         <button class="btn btn-danger delete-table">delete table</button>
       </div>
     {{/if}}
     <h1>{{tableName}}</h1>
   </div>
-
-  <div class="clearfix"></div>
 
   {{#each piles}}
     <div class="pile-wrapper">
