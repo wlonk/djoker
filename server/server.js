@@ -11,10 +11,11 @@ Meteor.publish("piles", function (tableId) {
 
 Meteor.publish("tables", function () {
   return Tables.find({
-    // $or: {
-      public: true
-      // user is member
-    // }
+    $or: [
+      {public: true},
+      {owner: this.userId}
+      // or user is member?
+    ]
   });
 })
 

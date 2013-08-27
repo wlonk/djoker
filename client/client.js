@@ -248,8 +248,10 @@ Template.createPileDialog.events({
 Template.createTableDialog.events({
   'click .save': function (evt) {
     var name = $('#name').val();
-    Meteor.call('createTable', {name: name});
-    // Router.navigate(newTableId, true);
+    // @todo: is there a better way to turn a checkbox into a boolean?
+    var public = !! $('#public').attr("checked");
+    Meteor.call('createTable', {name: name, public: public});
+    // Router.setTable(newTableId);
     Session.set("showCreateTableDialog", false);
     return false;
   },
@@ -267,12 +269,12 @@ Template.createTableDialog.events({
 var DjokerRouter = Backbone.Router.extend({
   routes: {
     "": "home",
-    ":tableId": "main"
+    ":tableId": "viewTable"
   },
   home: function () {
     Session.set("tableId", null);
   },
-  main: function (tableId) {
+  viewTable: function (tableId) {
     var oldTable = Session.get("tableId");
     if (oldTable !== tableId) {
       Session.set("tableId", tableId);

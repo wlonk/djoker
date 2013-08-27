@@ -248,10 +248,15 @@ Meteor.methods({
     if (! this.userId)
       throw new Meteor.Error(403, "You must be logged in");
     check(options, {
-      name: NonEmptyString
+      name: NonEmptyString,
+      public: Boolean
     });
 
-    return Tables.insert({name: options.name, public: true});
+    return Tables.insert({
+      owner: this.userId,
+      name: options.name,
+      public: options.public
+    });
   }
 });
 
