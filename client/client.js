@@ -6,27 +6,14 @@ Meteor.subscribe("userData");
 Session.setDefault("selectedCards", {});
 Session.setDefault("showAdjustVisibilityDialog", false);
 Session.setDefault("showCreatePileDialog", false);
+Session.setDefault("showCreateTableDialog", false);
 Session.setDefault("adjustVisibilityDialogPile", null);
 Session.setDefault("adjustVisibilityDialogChecklist", []);
 Session.setDefault("tableId", null);
 
-Template.displayController.tableId = function () {
-  return Session.get("tableId");
-}
-
-Template.displayController.loading = function () {
-  return pilesHandle && !pilesHandle.ready();
-}
-
-Template.table.showAdjustVisibilityDialog = function () {
-  return Session.get("showAdjustVisibilityDialog");
-}
-
-Template.table.showCreatePileDialog = function () {
-  return Session.get("showCreatePileDialog");
-}
-
-Template.table.userId = Meteor.userId;
+/****************************************************************************
+ * UTILITIES
+ */
 
 var pilesHandle = null;
 // Always be subscribed to the piles for the selected table.
@@ -38,6 +25,73 @@ Deps.autorun(function () {
     pilesHandle = null;
   }
 });
+
+var openCreatePileDialog = function (pileId) {
+  Session.set("showCreatePileDialog", true);
+};
+
+var openCreateTableDialog = function (pileId) {
+  Session.set("showCreateTableDialog", true);
+};
+
+var openAdjustVisibilityDialog = function (pileId) {
+  Session.set("adjustVisibilityDialogPile", pileId);
+  Session.set("showAdjustVisibilityDialog", true);
+};
+
+var visible = function (userId, visibleTo) {
+  return _.contains(visibleTo, userId) || _.contains(visibleTo, '*');
+}
+
+/****************************************************************************
+ * DISPLAY CONTROLLER
+ */
+
+Template.displayController.tableId = function () {
+  return Session.get("tableId");
+}
+
+Template.displayController.showCreateTableDialog = function () {
+  return Session.get("showCreateTableDialog");
+}
+
+Template.displayController.loading = function () {
+  return pilesHandle && !pilesHandle.ready();
+}
+
+/****************************************************************************
+ * TABLE LIST
+ */
+
+Template.tableList.tables = function () {
+  return Tables.find();
+}
+
+Template.tableList.events({
+  'click a': function (evt) {
+    evt.preventDefault();
+    Router.setTable(this._id);
+  },
+  'click .create-table': function () {
+    openCreateTableDialog();
+  }
+});
+
+/****************************************************************************
+ * TABLE
+ */
+
+Template.table.visible = visible;
+
+Template.table.userId = Meteor.userId;
+
+Template.table.showAdjustVisibilityDialog = function () {
+  return Session.get("showAdjustVisibilityDialog");
+}
+
+Template.table.showCreatePileDialog = function () {
+  return Session.get("showCreatePileDialog");
+}
 
 Template.table.tableName = function () {
   return Tables.findOne({_id: Session.get("tableId")}).name;
@@ -52,21 +106,6 @@ Template.table.piles = function () {
     return pile;
   });
 }
-
-var openAdjustVisibilityDialog = function (pileId) {
-  Session.set("adjustVisibilityDialogPile", pileId);
-  Session.set("showAdjustVisibilityDialog", true);
-};
-
-var openCreatePileDialog = function (pileId) {
-  Session.set("showCreatePileDialog", true);
-};
-
-var visible = function (userId, visibleTo) {
-  return _.contains(visibleTo, userId) || _.contains(visibleTo, '*');
-}
-
-Template.table.visible = visible;
 
 Template.table.inSelected = function (cardId) {
   var selectedCards = Session.get('selectedCards');
@@ -137,6 +176,10 @@ Template.table.events({
   }
 });
 
+/****************************************************************************
+ * ADJUST VISIBILITY DIALOG
+ */
+
 Template.adjustVisibilityDialog.users = function () {
   return Meteor.users.find();
 }
@@ -170,12 +213,13 @@ Template.adjustVisibilityDialog.events({
   }
 });
 
+/****************************************************************************
+ * CREATE PILE DIALOG
+ */
+
 Template.createPileDialog.deck_types = function () {
   return _.map(_.keys(deck_types), function (e) {
-    return {
-      name: e,
-      value: e
-    };
+    return {name: e, value: e};
   });
 }
 
@@ -191,23 +235,30 @@ Template.createPileDialog.events({
 
   'click .done': function (evt) {
     Session.set("showCreatePileDialog", false);
-    return false
+    return false;
   }
 });
 
-Template.tableList.tables = function () {
-  return Tables.find();
-}
 
-Template.tableList.events({
-  'click a': function (evt) {
-    evt.preventDefault();
-    Router.setTable(this._id);
+/****************************************************************************
+ * CREATE TABLE DIALOG
+ */
+
+Template.createTableDialog.events({
+  'click .save': function (evt) {
+    // Meteor.call('createTable', {});
+    Session.set("showCreateTableDialog", false);
+    return false;
+  },
+
+  'click .done': function (evt) {
+    Session.set("showCreateTableDialog", false);
+    return false;
   }
-})
+});
 
-/**
- * Routing and URLs and history, oh my.
+/****************************************************************************
+ * ROUTING AND URLS AND HISTORY, OH MY
  */
 
 var DjokerRouter = Backbone.Router.extend({

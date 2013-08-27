@@ -29,8 +29,11 @@
 </body>
 
 <template name="displayController">
+  {{#if showCreateTableDialog}}
+    {{> createTableDialog}}
+  {{/if}}
   {{#if loading}}
-    <div class="suble">
+    <div class="subtle">
       Loading&hellip;
     </div>
   {{else}}
@@ -166,8 +169,8 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-primary save">Create</button>
-      <button class="btn btn-primary done">Cancel</button>
+      <button class="btn btn-primary save">create</button>
+      <button class="btn btn-primary done">cancel</button>
     </div>
   </div>
 </template>
@@ -183,19 +186,9 @@
       <form class="form-horizontal">
         <fieldset>
           <div class="control-group">
-            <label class="control-label" for="name">Pile name</label>
+            <label class="control-label" for="name">Table name</label>
             <div class="controls">
               <input type="text" id="name" name="name" placeholder="Deck" autofocus>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="deck">Pile type</label>
-            <div class="controls">
-              <select id="deck" name="deck">
-                {{#each deck_types}}
-                  <option value="{{value}}">{{name}}</option>
-                {{/each}}
-              </select>
             </div>
           </div>
         </fieldset>
@@ -203,8 +196,8 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-primary save">Create</button>
-      <button class="btn btn-primary done">Cancel</button>
+      <button class="btn btn-primary save">create</button>
+      <button class="btn btn-primary done">cancel</button>
     </div>
   </div>
 </template>
@@ -216,5 +209,5 @@
       <li><a href="/{{_id}}">{{ name }}</a></li>
     {{/each}}
   </ul>
-  <button class="btn btn-primary">create table</button>
+  <button class="btn btn-primary create-table">create table</button>
 </template>
