@@ -14,6 +14,10 @@ Template.displayController.tableId = function () {
   return Session.get("tableId");
 }
 
+Template.displayController.loading = function () {
+  return pilesHandle && !pilesHandle.ready();
+}
+
 Template.table.showAdjustVisibilityDialog = function () {
   return Session.get("showAdjustVisibilityDialog");
 }
@@ -35,8 +39,8 @@ Deps.autorun(function () {
   }
 });
 
-Template.table.loading = function () {
-  return pilesHandle && !pilesHandle.ready();
+Template.table.tableName = function () {
+  return Tables.findOne({_id: Session.get("tableId")}).name;
 }
 
 Template.table.piles = function () {
@@ -179,7 +183,8 @@ Template.createPileDialog.events({
   'click .save': function (evt) {
     var name = $('#name').val();
     var deck = $('#deck').val();
-    Meteor.call('createPile', {name: name, deck: deck});
+    var table = Session.get("tableId");
+    Meteor.call('createPile', {table: table, name: name, deck: deck});
     Session.set("showCreatePileDialog", false);
     return false;
   },
