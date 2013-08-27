@@ -174,6 +174,11 @@ Template.table.events({
 
   'click .create-pile': function (evt) {
     openCreatePileDialog();
+  },
+
+  'click .delete-table': function () {
+    Tables.remove({_id: Session.get("tableId")});
+    Router.navigate('/', true);
   }
 });
 

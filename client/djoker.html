@@ -63,7 +63,10 @@
 
   <div id="table-header">
     {{#if loggedIn userId}}
-      <button class="pull-right btn btn-primary create-pile">create pile</button>
+      <div class="btn-group pull-right">
+        <button class="btn btn-primary create-pile">create pile</button>
+        <button class="btn btn-danger delete-table">delete table</button>
+      </div>
     {{/if}}
     <h1>{{tableName}}</h1>
   </div>
