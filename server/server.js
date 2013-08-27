@@ -13,8 +13,7 @@ Meteor.publish("tables", function () {
   return Tables.find({
     $or: [
       {public: true},
-      {owner: this.userId}
-      // or user is member?
+      {participants: this.userId}
     ]
   });
 })

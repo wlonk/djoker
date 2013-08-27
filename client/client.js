@@ -7,6 +7,7 @@ Session.setDefault("selectedCards", {});
 Session.setDefault("showAdjustVisibilityDialog", false);
 Session.setDefault("showCreatePileDialog", false);
 Session.setDefault("showCreateTableDialog", false);
+Session.setDefault("showEditTableDialog", false);
 Session.setDefault("adjustVisibilityDialogPile", null);
 Session.setDefault("adjustVisibilityDialogChecklist", []);
 Session.setDefault("tableId", null);
@@ -26,12 +27,16 @@ Deps.autorun(function () {
   }
 });
 
-var openCreatePileDialog = function (pileId) {
+var openCreatePileDialog = function () {
   Session.set("showCreatePileDialog", true);
 };
 
-var openCreateTableDialog = function (pileId) {
+var openCreateTableDialog = function () {
   Session.set("showCreateTableDialog", true);
+};
+
+var openEditTableDialog = function () {
+  Session.set("showEditTableDialog", true);
 };
 
 var openAdjustVisibilityDialog = function (pileId) {
@@ -93,6 +98,10 @@ Template.table.showCreatePileDialog = function () {
   return Session.get("showCreatePileDialog");
 }
 
+Template.table.showEditTableDialog = function () {
+  return Session.get("showEditTableDialog");
+}
+
 Template.table.tableName = function () {
   var table = Tables.findOne({_id: Session.get("tableId")});
   return _.isUndefined(table) ? "No such table" : table.name;
@@ -131,49 +140,53 @@ Template.table.pileVisibility = function (visibleTo, mode) {
 }
 
 Template.table.events({
-  'click .card': function (evt) {
+  'click .card': function () {
     var selectedCards = Session.get('selectedCards');
     if (_.isUndefined(selectedCards[this._id])) {
       selectedCards[this._id] = this;
     } else {
-      delete selectedCards[this._id];
+      selectedCards = _.omit(selectedCards, this._id);
     }
     Session.set('selectedCards', selectedCards);
   },
 
-  'click .move-to-here': function (evt) {
+  'click .move-to-here': function () {
     var toPileId = this._id;
     var cardIdArray = _.keys(Session.get('selectedCards'));
     Meteor.call('moveCards', toPileId, cardIdArray);
     Session.set('selectedCards', {});
   },
 
-  'click .shuffle': function (evt) {
+  'click .shuffle': function () {
     Meteor.call('shufflePile', this._id);
   },
 
-  'click .sort': function (evt) {
+  'click .sort': function () {
     Meteor.call('sortPile', this._id);
   },
 
-  'click .reveal-this-pile': function (evt) {
+  'click .reveal-this-pile': function () {
     Meteor.call('setPileVisibility', this._id, ['*']);
   },
 
-  'click .facedown-this-pile': function (evt) {
+  'click .facedown-this-pile': function () {
     Meteor.call('setPileVisibility', this._id, []);
   },
 
-  'click .adjust-visibility-on-this-pile': function (evt) {
+  'click .adjust-visibility-on-this-pile': function () {
     openAdjustVisibilityDialog(this._id);
   },
 
-  'click .trash-this-pile': function (evt) {
+  'click .trash-this-pile': function () {
     Piles.remove({_id: this._id});
   },
 
-  'click .create-pile': function (evt) {
+  'click .create-pile': function () {
     openCreatePileDialog();
+  },
+
+  'click .edit-table': function () {
+    openEditTableDialog();
   },
 
   'click .delete-table': function () {
@@ -204,7 +217,7 @@ Template.adjustVisibilityDialog.isViewer = function (userId, pileId) {
 }
 
 Template.adjustVisibilityDialog.events({
-  'click .save': function (evt) {
+  'click .save': function () {
     var userIdArray = $(':checked').toArray().map(function (e) {
       return $(e).data('id');
     });
@@ -213,7 +226,7 @@ Template.adjustVisibilityDialog.events({
     return false;
   },
 
-  'click .done': function (evt) {
+  'click .done': function () {
     Session.set("showAdjustVisibilityDialog", false);
     return false;
   }
@@ -230,16 +243,18 @@ Template.createPileDialog.deck_types = function () {
 }
 
 Template.createPileDialog.events({
-  'click .save': function (evt) {
-    var name = $('#name').val();
-    var deck = $('#deck').val();
-    var table = Session.get("tableId");
-    Meteor.call('createPile', {table: table, name: name, deck: deck});
+  'click .save': function () {
+    var options = {
+      name: $('#name').val(),
+      deck: $('#deck').val(),
+      table: Session.get("tableId")
+    };
+    Meteor.call('createPile', options);
     Session.set("showCreatePileDialog", false);
     return false;
   },
 
-  'click .done': function (evt) {
+  'click .done': function () {
     Session.set("showCreatePileDialog", false);
     return false;
   }
@@ -251,18 +266,61 @@ Template.createPileDialog.events({
  */
 
 Template.createTableDialog.events({
-  'click .save': function (evt) {
-    var name = $('#name').val();
-    // @todo: is there a better way to turn a checkbox into a boolean?
-    var public = !! $('#public').attr("checked");
-    Meteor.call('createTable', {name: name, public: public});
+  'click .save': function () {
+    var options = {
+      name: $('#name').val(),
+      // @todo: is there a better way to turn a checkbox into a boolean?
+      public: !! $('#public').attr("checked")
+    };
+    Meteor.call('createTable', options);
     // Router.setTable(newTableId);
     Session.set("showCreateTableDialog", false);
     return false;
   },
 
-  'click .done': function (evt) {
+  'click .done': function () {
     Session.set("showCreateTableDialog", false);
+    return false;
+  }
+});
+
+/****************************************************************************
+ * EDIT TABLE DIALOG
+ */
+
+Template.editTableDialog.table = function () {
+  return Tables.findOne({_id: Session.get("tableId")});
+}
+
+Template.editTableDialog.users = function () {
+  return Meteor.users.find();
+}
+
+Template.editTableDialog.displayName = function () {
+  return displayName(this);
+};
+
+Template.editTableDialog.userInParticipants = function (userId, table) {
+  return _.contains(table.participants, userId);
+}
+
+Template.editTableDialog.events({
+  'click .save': function () {
+    var options = {
+      tableId: Session.get("tableId"),
+      name: $('#name').val(),
+      public: !! $('#public').attr("checked"),
+      participants: $('.participants .active').toArray().map(function (x) {
+        return $(x).data('userid');
+      })
+    };
+    Meteor.call('editTable', options);
+    Session.set("showEditTableDialog", false);
+    return false;
+  },
+
+  'click .done': function () {
+    Session.set("showEditTableDialog", false);
     return false;
   }
 });

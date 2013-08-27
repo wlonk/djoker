@@ -18,6 +18,24 @@ var ValidDeck = Match.Where(function (x) {
   return _.contains(_.keys(deck_types), x);
 });
 
+var ValidUserArray = Match.Where(function (x) {
+  check(x, Array);
+  for (var i; i < x.length; i++) {
+    var arrayElement = x[i];
+    check(arrayElement, String);
+    if (!Meteor.users.find({_id: arrayElement}).count()) {
+      return false;
+    }
+  }
+  return true;
+});
+
+displayName = function (user) {
+  if (user.profile && user.profile.name)
+    return user.profile.name;
+  return user.emails[0].address;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // Piles
 var spades = '\u2660',
@@ -186,8 +204,9 @@ Tables.allow({
 
 Meteor.methods({
   createPile: function (options) {
-    if (! this.userId)
+    if (! this.userId) {
       throw new Meteor.Error(403, "You must be logged in");
+    }
     check(options, {
       table: ValidTable,
       name: NonEmptyString,
@@ -245,8 +264,9 @@ Meteor.methods({
   },
 
   createTable: function (options) {
-    if (! this.userId)
+    if (! this.userId) {
       throw new Meteor.Error(403, "You must be logged in");
+    }
     check(options, {
       name: NonEmptyString,
       public: Boolean
@@ -257,11 +277,19 @@ Meteor.methods({
       name: options.name,
       public: options.public
     });
+  },
+
+  editTable: function (options) {
+    if (! this.userId) {
+      throw new Meteor.Error(403, "You must be logged in");
+    }
+    check(options, {
+      tableId: ValidTable,
+      name: NonEmptyString,
+      public: Boolean,
+      participants: ValidUserArray
+    });
+    var updateOptions = _.omit(options, 'tableId');
+    Tables.update({_id: options.tableId}, {$set: updateOptions});
   }
 });
-
-displayName = function (user) {
-  if (user.profile && user.profile.name)
-    return user.profile.name;
-  return user.emails[0].address;
-};

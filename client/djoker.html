@@ -61,11 +61,15 @@
     {{/if}}
   {{/if}}
 
+  {{# if showEditTableDialog}}
+    {{> editTableDialog}}
+  {{/if}}
+
   <div id="table-header" class="clearfix">
     {{#if loggedIn userId}}
       <div class="btn-group pull-right">
         <button class="btn btn-primary create-pile">create pile</button>
-        <button class="btn btn-info invite-to-table">invite to table</button>
+        <button class="btn btn-info edit-table">edit table</button>
         <button class="btn btn-danger delete-table">delete table</button>
       </div>
     {{/if}}
@@ -210,11 +214,56 @@
   </div>
 </template>
 
+<template name="editTableDialog">
+  <div class="modal">
+    <div class="modal-header">
+      <button type="button" class="close done">&times;</button>
+      <h3>Create table</h3>
+    </div>
+
+    <div class="modal-body">
+      <form class="form-horizontal">
+        <fieldset>
+          <div class="control-group">
+            <label class="control-label" for="name">Table name</label>
+            <div class="controls">
+              {{#with table}}
+                <input type="text" id="name" name="name" autofocus value="{{name}}">
+              {{/with}}
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="public">Public?</label>
+            <div class="controls">
+              {{#with table}}
+                <input type="checkbox" id="public" name="public"{{#if public}} checked{{/if}}>
+              {{/with}}
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="participants">Participants</label>
+            <div class="controls participants">
+              {{#each users}}
+                <button type="button" class="btn btn-block btn-primary{{#if userInParticipants _id table}} active{{/if}}" data-toggle="button" data-userId="{{_id}}">{{displayName}}</button>
+              {{/each}}
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary save">save</button>
+      <button class="btn btn-primary done">cancel</button>
+    </div>
+  </div>
+</template>
+
 <template name="tableList">
   <h2>Tables:</h2>
   <ul>
     {{#each tables}}
-      <li><a href="/{{_id}}">{{ name }}</a></li>
+      <li><a href="/{{_id}}">{{name}}</a></li>
     {{/each}}
   </ul>
   <button class="btn btn-primary create-table">create table</button>
