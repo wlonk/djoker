@@ -1,7 +1,8 @@
 TODO
 ====
 
- - Add per-table division with routing, add invite-to-table facility.
+ - Add add invite-to-table on table creation
+ - Adjust View should only include participants of table, should use toggle-buttons
  - Add current-users
  - Add actions log
  - Add shuffle animation
