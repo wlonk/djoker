@@ -273,7 +273,7 @@ Meteor.methods({
     });
 
     return Tables.insert({
-      owner: this.userId,
+      participants: [this.userId],
       name: options.name,
       public: options.public
     });
