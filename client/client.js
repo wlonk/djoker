@@ -121,12 +121,7 @@ Template.table.participants = function () {
   var tableId = Session.get("tableId");
   var table = Tables.findOne({_id: tableId});
   if (table.public) {
-    // return Meteor.users.find();
-    return [{
-      profile: {
-        name: "public"
-      }
-    }];
+    return [{profile: {name: "public"}}];
   } else {
     return Meteor.users.find({_id: {$in: table.participants}});
   }
