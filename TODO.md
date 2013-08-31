@@ -1,7 +1,6 @@
 TODO
 ====
 
- - Add dismiss-modal-with-esc-or-background-click
  - Add actions log
  - Add shuffle animation
  - Add create-pile settings
