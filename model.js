@@ -31,9 +31,11 @@ var ValidUserArray = Match.Where(function (x) {
 });
 
 displayName = function (user) {
-  if (user.profile && user.profile.name)
+  if (user.profile && user.profile.name) {
     return user.profile.name;
-  return user.emails[0].address;
+  } else {
+    return user.emails[0].address;
+  }
 };
 
 function Set (array) {
@@ -289,6 +291,7 @@ Meteor.methods({
       participants: ValidUserArray
     });
 
+    // Ensure operating user is in participants.
     var participants_set = new Set(options.participants);
     var participants = participants_set.add(this.userId).toArray();
 
@@ -309,6 +312,11 @@ Meteor.methods({
       public: Boolean,
       participants: ValidUserArray
     });
+
+    // Ensure operating user is in participants.
+    var participants_set = new Set(options.participants);
+    options.participants = participants_set.add(this.userId).toArray();
+
     var updateOptions = _.omit(options, 'tableId');
     Tables.update({_id: options.tableId}, {$set: updateOptions});
   }

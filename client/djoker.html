@@ -65,15 +65,36 @@
     {{> editTableDialog}}
   {{/if}}
 
-  <div id="table-header" class="clearfix">
-    {{#if loggedIn userId}}
-      <div class="btn-group pull-right">
-        <button class="btn btn-primary create-pile">create pile</button>
-        <button class="btn btn-info edit-table">edit table</button>
-        <button class="btn btn-danger delete-table">delete table</button>
-      </div>
-    {{/if}}
-    <h1>{{tableName}}</h1>
+  <div id="table-header" class="navbar">
+    <div class="navbar-inner">
+      <a class="brand">{{tableName}}</a>
+      {{#if loggedIn userId}}
+        <ul class="nav pull-right">
+
+          <li class="dropdown">
+            <a class="clickable dropdown-toggle" role="button" data-toggle="dropdown" data-target="#">
+              participants
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              {{#each participants}}
+                <li><a>{{displayName}}</a></li>
+              {{/each}}
+            </ul>
+          </li>
+
+          <li>
+            <a class="clickable create-pile">create pile</a>
+          </li>
+          <li>
+            <a class="clickable edit-table">edit table</a>
+          </li>
+          <li>
+            <a class="clickable delete-table">delete table</a>
+          </li>
+        </ul>
+      {{/if}}
+    </div>
   </div>
 
   {{#each piles}}

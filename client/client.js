@@ -117,6 +117,25 @@ Template.table.piles = function () {
   });
 }
 
+Template.table.participants = function () {
+  var tableId = Session.get("tableId");
+  var table = Tables.findOne({_id: tableId});
+  if (table.public) {
+    // return Meteor.users.find();
+    return [{
+      profile: {
+        name: "public"
+      }
+    }];
+  } else {
+    return Meteor.users.find({_id: {$in: table.participants}});
+  }
+}
+
+Template.table.displayName = function ()  {
+  return displayName(this);
+}
+
 Template.table.inSelected = function (cardId) {
   var selectedCards = Session.get('selectedCards');
   return !(_.isUndefined(selectedCards[this._id]))

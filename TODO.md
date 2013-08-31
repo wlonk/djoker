@@ -2,6 +2,7 @@ TODO
 ====
 
  - Add current-users
+ - Navigate to table on create-table
  - Add dismiss-modal-with-esc-or-background-click
  - Add actions log
  - Add shuffle animation
