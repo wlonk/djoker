@@ -200,7 +200,13 @@ Template.table.events({
  */
 
 Template.adjustVisibilityDialog.users = function () {
-  return Meteor.users.find();
+  var tableId = Session.get("tableId");
+  var table = Tables.findOne({_id: tableId});
+  if (table.public) {
+    return Meteor.users.find();
+  } else {
+    return Meteor.users.find({_id: {$in: table.participants}});
+  }
 }
 
 Template.adjustVisibilityDialog.pileId = function () {
