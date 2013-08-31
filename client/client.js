@@ -218,8 +218,8 @@ Template.adjustVisibilityDialog.isViewer = function (userId, pileId) {
 
 Template.adjustVisibilityDialog.events({
   'click .save': function () {
-    var userIdArray = $(':checked').toArray().map(function (e) {
-      return $(e).data('id');
+    var userIdArray = $('.viewers .active').toArray().map(function (x) {
+      return $(x).data('userid');
     });
     Meteor.call('setPileVisibility', Session.get("adjustVisibilityDialogPile"), userIdArray);
     Session.set("showAdjustVisibilityDialog", false);

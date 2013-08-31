@@ -1,7 +1,6 @@
 TODO
 ====
 
- - Adjust View should only include participants of table, should use toggle-buttons
  - Add current-users
  - Add dismiss-modal-with-esc-or-background-click
  - Add actions log

@@ -125,14 +125,14 @@
     <div class="modal-body">
       <form class="form-horizontal">
         <fieldset>
-          {{#each users}}
-            <div class="control-group">
-              <label class="control-label" for="user_{{_id}}">{{displayName}}</label>
-              <div class="controls">
-                <input type="checkbox" id="user_{{_id}}" name="user_{{_id}}" data-id="{{_id}}"{{#if isViewer _id pileId}} checked{{/if}}>
-              </div>
+          <div class="control-group">
+            <label class="control-label" for="viewers">Viewers</label>
+            <div class="controls viewers">
+              {{#each users}}
+                <button type="button" class="btn btn-block btn-primary{{#if isViewer _id pileId}} active{{/if}}" data-toggle="button" data-userId="{{_id}}">{{displayName}}</button>
+              {{/each}}
             </div>
-          {{/each}}
+          </div>
         </fieldset>
       </form>
     </div>
