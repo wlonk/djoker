@@ -265,12 +265,23 @@ Template.createPileDialog.events({
  * CREATE TABLE DIALOG
  */
 
+Template.createTableDialog.users = function () {
+  return Meteor.users.find({_id: {$not: Meteor.userId()}});
+}
+
+Template.createTableDialog.displayName = function () {
+  return displayName(this);
+};
+
 Template.createTableDialog.events({
   'click .save': function () {
     var options = {
       name: $('#name').val(),
       // @todo: is there a better way to turn a checkbox into a boolean?
-      public: !! $('#public').attr("checked")
+      public: !! $('#public').attr("checked"),
+      participants: $('.participants .active').toArray().map(function (x) {
+        return $(x).data('userid');
+      })
     };
     Meteor.call('createTable', options);
     // Router.setTable(newTableId);
@@ -293,7 +304,7 @@ Template.editTableDialog.table = function () {
 }
 
 Template.editTableDialog.users = function () {
-  return Meteor.users.find();
+  return Meteor.users.find({_id: {$not: Meteor.userId()}});
 }
 
 Template.editTableDialog.displayName = function () {

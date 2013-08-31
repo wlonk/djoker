@@ -203,6 +203,14 @@
               <input type="checkbox" id="public" name="public">
             </div>
           </div>
+          <div class="control-group">
+            <label class="control-label" for="participants">Participants</label>
+            <div class="controls participants">
+              {{#each users}}
+                <button type="button" class="btn btn-block btn-primary{{#if userInParticipants _id table}} active{{/if}}" data-toggle="button" data-userId="{{_id}}">{{displayName}}</button>
+              {{/each}}
+            </div>
+          </div>
         </fieldset>
       </form>
     </div>

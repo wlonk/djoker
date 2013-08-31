@@ -36,6 +36,22 @@ displayName = function (user) {
   return user.emails[0].address;
 };
 
+function Set (array) {
+  this.array = {};
+  for (var i = 0; i < array.length; i++) {
+    this.array[array[i]] = true;
+  }
+}
+
+Set.prototype.add = function (item) {
+  this.array[item] = true;
+  return this;
+}
+
+Set.prototype.toArray = function () {
+  return _.keys(this.array);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Piles
 var spades = '\u2660',
@@ -269,11 +285,15 @@ Meteor.methods({
     }
     check(options, {
       name: NonEmptyString,
-      public: Boolean
+      public: Boolean,
+      participants: ValidUserArray
     });
 
+    var participants_set = new Set(options.participants);
+    var participants = participants_set.add(this.userId).toArray();
+
     return Tables.insert({
-      participants: [this.userId],
+      participants: participants,
       name: options.name,
       public: options.public
     });
