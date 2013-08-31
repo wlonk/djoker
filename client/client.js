@@ -246,9 +246,24 @@ Template.adjustVisibilityDialog.events({
     return false;
   },
 
-  'click .done': function () {
+  'click .mask, click .done': function () {
     Session.set("showAdjustVisibilityDialog", false);
     return false;
+  },
+
+  // @todo: this seems not to work, because there's no text area in this
+  // template.
+  'keydown': function (e) {
+    if (e.which === 13) { // Enter
+      $('.save').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (e.which === 27) { // Esc
+      $('.done').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 });
 
@@ -274,9 +289,22 @@ Template.createPileDialog.events({
     return false;
   },
 
-  'click .done': function () {
+  'click .mask, click .done': function () {
     Session.set("showCreatePileDialog", false);
     return false;
+  },
+
+  'keydown': function (e) {
+    if (e.which === 13) { // Enter
+      $('.save').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (e.which === 27) { // Esc
+      $('.done').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 });
 
@@ -310,9 +338,22 @@ Template.createTableDialog.events({
     return false;
   },
 
-  'click .done': function () {
+  'click .mask, click .done': function () {
     Session.set("showCreateTableDialog", false);
     return false;
+  },
+
+  'keydown': function (e) {
+    if (e.which === 13) { // Enter
+      $('.save').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (e.which === 27) { // Esc
+      $('.done').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 });
 
@@ -351,9 +392,22 @@ Template.editTableDialog.events({
     return false;
   },
 
-  'click .done': function () {
+  'click .mask, click .done': function () {
     Session.set("showEditTableDialog", false);
     return false;
+  },
+
+  'keydown': function (e) {
+    if (e.which === 13) { // Enter
+      $('.save').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (e.which === 27) { // Esc
+      $('.done').click();
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 });
 
