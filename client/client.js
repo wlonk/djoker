@@ -303,8 +303,9 @@ Template.createTableDialog.events({
         return $(x).data('userid');
       })
     };
-    Meteor.call('createTable', options);
-    // Router.setTable(newTableId);
+    Meteor.call('createTable', options, function (err, data) {
+      Router.setTable(data);
+    });
     Session.set("showCreateTableDialog", false);
     return false;
   },
