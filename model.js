@@ -218,7 +218,22 @@ Tables.allow({
   remove: function () {
     return true;
   }
-})
+});
+
+LogEvents = new Meteor.Collection("logEvents");
+
+// @todo: allow all right now.
+LogEvents.allow({
+  insert: function () {
+    return true;
+  },
+  update: function () {
+    return true;
+  },
+  remove: function () {
+    return true;
+  }
+});
 
 Meteor.methods({
   createPile: function (options) {
@@ -238,19 +253,33 @@ Meteor.methods({
       ids.push(Cards.insert(initial_cards[i]));
     }
 
-    return Piles.insert({
+    var ret = Piles.insert({
       table: options.table,
       owner: this.userId,
       name: options.name,
       cards: ids,
       visibleTo: [this.userId]
     });
+
+    LogEvents.insert({
+      timestamp: new Date().toString(),
+      event: "Pile " + options.name + " created.",
+      tableId: options.table
+    });
+
+    return ret;
   },
 
   shufflePile: function (pileId) {
     var pile = Piles.findOne({_id: pileId});
     var shuffled_cards = _.shuffle(pile.cards);
     Piles.update({_id: pileId}, {$set: {cards: shuffled_cards}});
+
+    LogEvents.insert({
+      timestamp: new Date().toString(),
+      event: "Pile " + pile.name + " shuffled.",
+      tableId: pile.table
+    });
   },
 
   sortPile: function (pileId) {
@@ -262,6 +291,12 @@ Meteor.methods({
       return card.suit + card.value;
     }), '_id');
     Piles.update({_id: pileId}, {$set: {cards: sorted_cards}});
+
+    LogEvents.insert({
+      timestamp: new Date().toString(),
+      event: "Pile " + pile.name + " sorted.",
+      tableId: pile.table
+    });
   },
 
   moveCards: function (toPileId, cardIdArray) {
@@ -271,6 +306,13 @@ Meteor.methods({
       Piles.update({_id: fromPileId}, {$pull: {cards: cardId}});
       Piles.update({_id: toPileId}, {$push: {cards: cardId}});
     }
+
+    var toPile = Piles.findOne({_id: toPileId});
+    LogEvents.insert({
+      timestamp: new Date().toString(),
+      event: cardIdArray.length + " cards moved to " + toPile.name + ".",
+      tableId: toPile.table
+    });
   },
 
   setPileVisibility: function (pileId, visibilityList) {
@@ -279,6 +321,13 @@ Meteor.methods({
       visibilityList = ['*'];
     }
     Piles.update({_id: pileId}, {$set: {visibleTo: visibilityList}});
+
+    var pile = Piles.findOne({_id: pileId});
+    LogEvents.insert({
+      timestamp: new Date().toString(),
+      event: "Pile " + pile.name + " visibility adjusted.",
+      tableId: pile.table
+    });
   },
 
   createTable: function (options) {

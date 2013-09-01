@@ -16,6 +16,10 @@ Meteor.publish("tables", function () {
       {participants: this.userId}
     ]
   });
+});
+
+Meteor.publish("logEvents", function () {
+  return LogEvents.find({}, {sort: {timestamp: -1}});
 })
 
 Meteor.publish("userData", function () {

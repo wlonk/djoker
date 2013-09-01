@@ -1,6 +1,7 @@
 Meteor.subscribe("cards");
 Meteor.subscribe("piles");
 Meteor.subscribe("tables");
+Meteor.subscribe("logEvents");
 Meteor.subscribe("userData");
 
 Session.setDefault("selectedCards", {});
@@ -127,6 +128,10 @@ Template.table.participants = function () {
   }
 }
 
+Template.table.logEvents = function () {
+  return LogEvents.find({tableId: Session.get("tableId")});
+}
+
 Template.table.displayName = function ()  {
   return displayName(this);
 }
@@ -193,6 +198,10 @@ Template.table.events({
 
   'click .trash-this-pile': function () {
     Piles.remove({_id: this._id});
+  },
+
+  'click .show-log': function () {
+    $('#wat').slideToggle();
   },
 
   'click .create-pile': function () {

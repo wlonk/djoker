@@ -68,21 +68,22 @@
   <div id="table-header" class="navbar">
     <div class="navbar-inner">
       <a class="brand">{{tableName}}</a>
-      {{#if loggedIn userId}}
-        <ul class="nav pull-right">
-
-          <li class="dropdown">
-            <a class="clickable dropdown-toggle" role="button" data-toggle="dropdown" data-target="#">
-              participants
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-              {{#each participants}}
-                <li><a>{{displayName}}</a></li>
-              {{/each}}
-            </ul>
-          </li>
-
+      <ul class="nav pull-right">
+        <li class="clickable show-log">
+          <a>log</a>
+        </li>
+        <li class="dropdown">
+          <a class="clickable dropdown-toggle" role="button" data-toggle="dropdown" data-target="#">
+            participants
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu" role="menu">
+            {{#each participants}}
+              <li><a>{{displayName}}</a></li>
+            {{/each}}
+          </ul>
+        </li>
+        {{#if loggedIn userId}}
           <li>
             <a class="clickable create-pile">create pile</a>
           </li>
@@ -92,10 +93,19 @@
           <li>
             <a class="clickable delete-table">delete table</a>
           </li>
-        </ul>
-      {{/if}}
+        {{/if}}
+      </ul>
+    </div>
+    <!-- use style attribute to play well with jQuery -->
+    <div class="well log" id="wat" style="display: none;">
+      <ul>
+        {{#each logEvents}}
+          <li>{{event}} ({{timestamp}})</li>
+        {{/each}}
+      </ul>
     </div>
   </div>
+
 
   {{#each piles}}
     <div class="pile-wrapper">
