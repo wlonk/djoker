@@ -159,7 +159,8 @@ Template.table.pileVisibility = function (visibleTo, mode) {
 
 Template.table.rendered = function () {
   $('.card').draggable({
-    opacity: 0.4
+    opacity: 0.4,
+    revert: 'invalid'
   });
   $('.pile').droppable({
     hoverClass: 'selected',
