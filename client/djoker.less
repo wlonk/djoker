@@ -64,15 +64,23 @@ a:hover {
   cursor: pointer;
 }
 
+@pile_padding: 5px;
+@overlap: -10px;
+@facedown_overlap: -30px;
+
 .pile {
   .rounded-corners(5px);
   border: 1px solid black;
   min-height: 130px;
   width: 286px;
-  padding-top: 5px;
-  padding-right: 5px;
+  padding-top: @pile_padding;
+  padding-right: @pile_padding;
   padding-bottom: 2px;
-  padding-left: 15px;
+  padding-left: (-@overlap + @pile_padding);
+}
+
+.pile.facedown {
+  padding-left: (-@facedown_overlap + @pile_padding);
 }
 
 .pile-wrapper {
@@ -87,7 +95,7 @@ a:hover {
   width: 30px;
   float: left;
   background-color: white;
-  margin-left: -10px;
+  margin-left: @overlap;
   margin-bottom: 3px;
   cursor: pointer;
   color: black;
@@ -102,6 +110,7 @@ a:hover {
   text-align: center;
   background-color: @cardback;
   color: black;
+  margin-left: @facedown_overlap;
 }
 
 .selected {

@@ -110,7 +110,7 @@
   {{#each piles}}
     <div class="pile-wrapper">
       <span class="pile-name">{{name}}</span>
-      <div class="pile clearfix" data-pileid="{{_id}}">
+      <div class="pile{{#unless visible userId visibleTo}} facedown{{/unless}} clearfix" data-pileid="{{_id}}">
         {{#if visible userId visibleTo}}
           {{#each cards}}
             <div class="card {{suit}}" data-cardid={{_id}}>
