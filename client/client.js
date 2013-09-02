@@ -135,6 +135,11 @@ Template.table.displayName = function ()  {
   return displayName(this);
 }
 
+Template.table.size = function (pileId) {
+  var pile = Piles.findOne({_id: pileId});
+  return pile.cards.length;
+}
+
 Template.table.loggedIn = function (userId) {
   return !!userId;
 }
