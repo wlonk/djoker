@@ -7,14 +7,14 @@ www.colourlovers.com/palette/59867/Blown_Entrepreneur
 /* */
 @cardback: #44749d;
 @glow: #c6d4e1;
-@subtle: #ebe7e0;
+@subtle: #c6d4e1;
 @text: #bdb8ad;
-@background: #ffffff;
+@background: #ebe7e0;
 /* */
 
 /*
 Fireball
-http://www.colourlovers.com/palette/3005342/Fireball?widths=1
+http://www.colourlovers.com/palette/3005342/Fireball
 */
 /* * /
 @cardback: #a44c19;
@@ -22,6 +22,54 @@ http://www.colourlovers.com/palette/3005342/Fireball?widths=1
 @subtle: #e7cd80;
 @text: #d9b65b;
 @background: #eddcb0;
+/* */
+
+/*
+Groovy_Lines
+http://www.colourlovers.com/palette/3018844/Groovy_Lines
+*/
+/* * /
+@cardback: #7f3c1f;
+@glow: #d97827;
+@subtle: #8d694f;
+@text: #053e47;
+@background: #efd4b6;
+
+@text_shadow: #000000;
+@navbar_gradient_from: lighten(@cardback, 5%);
+@navbar_gradient_to: darken(@cardback, 5%);
+@btn_primary_gradient_from: lighten(@cardback, 5%);
+@btn_primary_gradient_to: darken(@cardback, 5%);
+/* */
+
+@pile_padding: 5px;
+@overlap: -10px;
+@facedown_overlap: -30px;
+
+/* Bootstrap overrides */
+/* * /
+.navbar-inner {
+  background-color: @cardback;
+  background-image: -moz-linear-gradient(top, @navbar_gradient_from, @navbar_gradient_to);
+  background-image: -ms-linear-gradient(top, @navbar_gradient_from, @navbar_gradient_to);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@navbar_gradient_from), to(@navbar_gradient_to));
+  background-image: -webkit-linear-gradient(top, @navbar_gradient_from, @navbar_gradient_to);
+  background-image: -o-linear-gradient(top, @navbar_gradient_from, @navbar_gradient_to);
+  background-image: linear-gradient(top, @navbar_gradient_from, @navbar_gradient_to);
+}
+.navbar .brand {
+  text-shadow: 0 1px 0 @text_shadow;
+}
+.navbar .nav > li > a {
+  text-shadow: 0 1px 0 @text_shadow;
+}
+.btn-primary {
+  background-color: @cardback;
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@btn_primary_gradient_from), to(@btn_primary_gradient_to));
+  background-image: -webkit-linear-gradient(top, @btn_primary_gradient_from, @btn_primary_gradient_to);
+  background-image: -o-linear-gradient(top, @btn_primary_gradient_from, @btn_primary_gradient_to);
+  background-image: linear-gradient(to bottom, @btn_primary_gradient_from, @btn_primary_gradient_to);
+}
 /* */
 
 body {
@@ -64,13 +112,10 @@ a:hover {
   cursor: pointer;
 }
 
-@pile_padding: 5px;
-@overlap: -10px;
-@facedown_overlap: -30px;
-
 .pile {
   .rounded-corners(5px);
   border: 1px solid black;
+  background-color: #ffffff;
   min-height: 130px;
   width: 286px;
   padding-top: @pile_padding;
@@ -136,4 +181,23 @@ a:hover {
   .top-rounded-corners(0px);
   margin: 0 auto;
   width: 94%;
+  font-family: monospace;
+}
+
+.rotate (@rot: -20deg) {
+  -webkit-transform: rotate(@rot);
+  -moz-transform: rotate(@rot);
+  -ms-transform: rotate(@rot);
+  -o-transform: rotate(@rot);
+  transform: rotate(@rot);
+}
+
+.alpha {
+  .rotate;
+  position: absolute;
+  display: inline-block;
+  top: 5px;
+  left: 5px;
+  color: @subtle;
+  font-size: smaller;
 }
