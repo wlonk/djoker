@@ -45,6 +45,7 @@ http://www.colourlovers.com/palette/3018844/Groovy_Lines
 @pile_padding: 5px;
 @overlap: -10px;
 @facedown_overlap: -30px;
+@pile_width: 286px;
 
 /* Bootstrap overrides */
 /* * /
@@ -114,10 +115,11 @@ a:hover {
 
 .pile {
   .rounded-corners(5px);
+  box-sizing: border-box;
   border: 1px solid black;
   background-color: #ffffff;
   min-height: 130px;
-  width: 286px;
+  width: @pile_width;
   padding-top: @pile_padding;
   padding-right: @pile_padding;
   padding-bottom: 2px;
