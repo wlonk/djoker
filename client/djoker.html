@@ -110,16 +110,16 @@
   {{#each piles}}
     <div class="pile-wrapper">
       <span class="pile-name">{{name}}</span>
-      <div class="pile clearfix">
+      <div class="pile clearfix" data-pileid="{{_id}}">
         {{#if visible userId visibleTo}}
           {{#each cards}}
-            <div class="card {{suit}}{{#if inSelected _id}} selected{{/if}}">
+            <div class="card {{suit}}" data-cardid={{_id}}>
               {{value}}
             </div>
           {{/each}}
         {{else}}
           {{#each cards}}
-          <div class="card facedown{{#if inSelected _id}} selected{{/if}}">
+          <div class="card facedown" data-cardid={{_id}}>
             ?
           </div>
           {{/each}}
@@ -128,7 +128,6 @@
       {{#if loggedIn userId}}
         <div class="pile-controls button-toolbar pull-right">
           <div class="btn-group">
-            <button class="btn btn-small move-to-here"><i class="icon-magnet"></i></button>
             <button class="btn btn-small shuffle"><i class="icon-random"></i></button>
             <button class="btn btn-small sort"><i class="icon-list"></i></button>
           </div>

@@ -4,7 +4,6 @@ Meteor.subscribe("tables");
 Meteor.subscribe("logEvents");
 Meteor.subscribe("userData");
 
-Session.setDefault("selectedCards", {});
 Session.setDefault("showAdjustVisibilityDialog", false);
 Session.setDefault("showCreatePileDialog", false);
 Session.setDefault("showCreateTableDialog", false);
@@ -136,11 +135,6 @@ Template.table.displayName = function ()  {
   return displayName(this);
 }
 
-Template.table.inSelected = function (cardId) {
-  var selectedCards = Session.get('selectedCards');
-  return !(_.isUndefined(selectedCards[this._id]))
-}
-
 Template.table.loggedIn = function (userId) {
   return !!userId;
 }
@@ -158,24 +152,21 @@ Template.table.pileVisibility = function (visibleTo, mode) {
   return false;
 }
 
-Template.table.events({
-  'click .card': function () {
-    var selectedCards = Session.get('selectedCards');
-    if (_.isUndefined(selectedCards[this._id])) {
-      selectedCards[this._id] = this;
-    } else {
-      selectedCards = _.omit(selectedCards, this._id);
+Template.table.rendered = function () {
+  $('.card').draggable({
+    opacity: 0.4
+  });
+  $('.pile').droppable({
+    hoverClass: 'selected',
+    drop: function (evt, ui) {
+      var toPileId = $(this).data("pileid");
+      var cardIdArray = [$(ui.draggable).data("cardid")];
+      Meteor.call('moveCards', toPileId, cardIdArray);
     }
-    Session.set('selectedCards', selectedCards);
-  },
+  })
+}
 
-  'click .move-to-here': function () {
-    var toPileId = this._id;
-    var cardIdArray = _.keys(Session.get('selectedCards'));
-    Meteor.call('moveCards', toPileId, cardIdArray);
-    Session.set('selectedCards', {});
-  },
-
+Template.table.events({
   'click .shuffle': function () {
     Meteor.call('shufflePile', this._id);
   },
