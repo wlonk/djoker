@@ -152,9 +152,9 @@
         <fieldset>
           <div class="control-group">
             <label class="control-label" for="viewers">Viewers</label>
-            <div class="controls viewers">
+            <div class="controls viewers" data-toggle="button">
               {{#each users}}
-                <button type="button" class="btn btn-block btn-primary{{#if isViewer _id pileId}} active{{/if}}" data-toggle="button" data-userId="{{_id}}">{{displayName}}</button>
+                <button type="button" class="btn btn-block btn-primary{{#if isViewer _id pileId}} active{{/if}}" data-userid="{{_id}}">{{displayName}}</button>
               {{/each}}
             </div>
           </div>
@@ -232,9 +232,9 @@
           </div>
           <div class="control-group">
             <label class="control-label" for="participants">Participants</label>
-            <div class="controls participants">
+            <div class="controls participants" data-toggle="button">
               {{#each users}}
-                <button type="button" class="btn btn-block btn-primary{{#if userInParticipants _id table}} active{{/if}}" data-toggle="button" data-userId="{{_id}}">{{displayName}}</button>
+                <button type="button" class="btn btn-block btn-primary{{#if userInParticipants _id table}} active{{/if}}" data-userid="{{_id}}">{{displayName}}</button>
               {{/each}}
             </div>
           </div>
