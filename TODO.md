@@ -1,6 +1,7 @@
 TODO
 ====
 
+ - Move handlebars helpers to Template.name.helpers({})
  - Add shuffle animation
  - Add create-pile settings
  - Add pile ordering
