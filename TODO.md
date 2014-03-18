@@ -8,3 +8,6 @@ TODO
  - Add card ordering
  - Verify table log
  - Add explanatory video?
+ - Allow discarding many cards at once
+ - Allow users to reorder decks
+ - Allow users to change size of the pile div
